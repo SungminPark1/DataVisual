@@ -1,0 +1,86 @@
+body {
+  background-color: #D7D7D7;
+}
+
+.wrapper {
+  margin: 0 auto;
+  width: 100%;
+}
+
+h1 {
+  text-align: center;
+}
+
+.svg__container {
+  position: relative;
+}
+
+.svg__graph {
+  margin: 0 auto;
+  width: 800px;
+}
+
+.control {
+  margin: 0 auto;
+  padding: 10px 0 20px 0;
+  width: 800px;
+  background-color: #EBEBEB;
+  color: rgb(0,0,0);
+  text-align: center;
+}
+
+#year__value {
+  margin: 0 auto 5px auto;
+  width: 150px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#year__range {
+  width: 250px;
+}
+
+#min__value {
+  position: relative;
+  left: 20px;
+  top: 14px;
+  font-size: 14px;
+}
+
+#max__value {
+  position: relative;
+  left: -20px;
+  top: 14px;
+  font-size: 14px;
+}
+
+button {
+  width: 100px;
+  height: 50px;
+  margin: 0 20px 10px 20px;
+}
+
+.text__container {
+  margin: 0 auto;
+  width: 630px;
+  margin-top: 10px;
+  padding: 10px 150px 10px 20px;
+  background-color: #EBEBEB;
+}
+
+.legend {
+  position: absolute;
+  top: 34px;
+  right: 20px;
+  padding: 10px;
+  border: 1px solid black;
+  background-color: white;
+}
+
+#obesityRect:hover {
+  fill: #0E10B8;
+}
+
+#baRect:hover {
+  fill: #027301;
+}
