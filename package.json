@@ -1,0 +1,40 @@
+{
+  "name": "dataVisual",
+  "version": "1.0.0",
+  "engines": {
+    "node": "8.4.0",
+    "npm": "5.3.0"
+  },
+  "description": "dataVisual",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "start:dev": "nodemon --watch ./src ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Test Complete\"",
+    "build": "babel ./client --out-file ./hosted/bundle.js",
+    "build:watch": "babel --watch ./client --out-file ./hosted/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SungminPark1/DataVisual.git"
+  },
+  "author": "Sungmin Park",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SungminPark1/DataVisual/issues"
+  },
+  "homepage": "https://github.com/SungminPark1/DataVisual#readme",
+  "dependencies": {
+    "express": "^4.16.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "eslint": "^4.6.1",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "nodemon": "^1.12.1"
+  }
+}
