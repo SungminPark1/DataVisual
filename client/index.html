@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Project 2</title>
+    <title>Project 3</title>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://d3js.org/topojson.v2.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/assets/style.css">
@@ -11,7 +11,7 @@
 
   <body>
     <div class="wrapper">
-      <h1>US Poverty/Unemployment Rate Map</h1>
+      <h1>US Poverty and Education Map</h1>
       <div class="visual__container">
         <div class="svg__container">
           <div class="svg__graph"></div>
@@ -20,16 +20,24 @@
           <h2>Control</h2>
           <div class="controls">
             <div>
-              <input type="radio" name="type" id="unemploymentButton" />
-              <label>Unemployment</label>
-            </div>
-            <div>
               <input type="radio" name="type" id="povertyButton" checked="checked" />
-              <label>Poverty</label>
+              <label>Poverty Rate</label>
             </div>
             <div>
               <input type="radio" name="type" id="childProvertyButton" />
-              <label>Child Proverty</label>
+              <label>Child Proverty Rate</label>
+            </div>
+            <div>
+              <input type="radio" name="type" id="highSchoolGradButton" />
+              <label>High School Graduate Rate</label>
+            </div>
+            <div>
+              <input type="radio" name="type" id="higherEduButton" />
+              <label>Higher Education Rate</label>
+            </div>
+            <div>
+              <input type="radio" name="type" id="expendPerStudentButton" />
+              <label>Education expend per student</label>
             </div>
           </div>
         </div>
@@ -37,24 +45,10 @@
       <div class="text__container">
         <h3>Info</h3>
         <p>
-          Data from The Center of American Progress. Map geometry data from d3's us json. Code is in ES6.
-        </p>
-        <p>
-          The map above shows the state poverty and unemployment rate through a redish saturation gradient.
-          The usere can click on the radio buttons in the control to change the value to display. The user
-          would notice that states that the three data (Poverty, Child Proverty, and Unemployment) have a
-          correlation. States with higher poverty rate tend to have higher unemployment and higher child poverty
-          rates. If the usere wishes to see all three rates they can hover over a state to see the exact values.
-        </p>
-        <p>
-          The map was created using d3's geoPath and the geometry provided in the d3's us json file. D3's topojson
-          was used to turn the features into useable data and also to create the state border path. Then each data point
-          was manually labelled with the correct state abbr. using the data points id. This allowed the 2nd data set,
-          state poverty and unemployment rate data, to be mapped to the correct state. Afterwards polish was added such
-          as transition effects, radio button event listeners, etc.
+          Data from The Center of American Progress and The National Center for Education Statistics. Map geometry data from d3's us json. US Map overview code is in ES6 (may not work in some browsers).
         </p>
       </div>
     </div>
   </body>
-  <script src="/assets/project2Script.js"></script>
+  <script src="/assets/mapScript.js"></script>
 </html>

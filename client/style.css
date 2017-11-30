@@ -20,13 +20,14 @@ body {
   display: inline-block;
   vertical-align: top;
   background-color: white;
-  width: 200px;
+  width: 250px;
   height: 600px;
   margin-left: 6px;
   padding: 30px 0;
 }
 
 .control__container h2 {
+  margin-top: 0;
   text-align: center;
 }
 
