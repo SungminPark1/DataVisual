@@ -5,20 +5,15 @@
 const width = 960;
 const height = 600;
 
-// return word with space infront of capital letters TotalStudent -> Total Student
-const addSpace = str => str.replace(/([A-Z])/g, ' $1').trim();
-
-// return number with commas
-const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
 const svg = d3.select('div.svg__graph').append('svg')
   .attr('width', width)
   .attr('height', height)
   .style('padding', '30px 30px 30px 60px')
   .style('background-color', 'white');
 
-let dataSet = {};
 const objectDataSet = {};
+let dataSet = {};
+let svgLegend;
 let toolTip;
 let scaleColor;
 
@@ -80,7 +75,13 @@ const stateIds = {
 };
 let states;
 
-const visMap = (dataValue) => {
+// return word with space infront of capital letters TotalStudent -> Total Student
+const addSpace = str => str.replace(/([A-Z])/g, ' $1').trim();
+
+// return number with commas
+const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+const visMap = (dataValue, rOffset, gOffset, bOffset) => {
   states.transition()
     .duration(400)
     .delay((d, i) => i * 10)
@@ -92,7 +93,11 @@ const visMap = (dataValue) => {
       const data = objectDataSet[stateIds[d.id]];
       const scale = Math.round(scaleColor(parseFloat(data[dataValue])));
 
-      return `rgb(${(100 + scale) || 0}, ${scale || 0}, ${scale || 0})`;
+      if (scale || scale === 0) {
+        return `rgb(${(rOffset + scale)}, ${gOffset + scale}, ${bOffset + scale})`;
+      }
+
+      return 'rgb(150, 150, 150)';
     });
 };
 
@@ -114,55 +119,102 @@ const visLegend = (text, min, max, gradientType = 'gradientType1') => {
 
 const visPoverty = () => {
   // set the gradient scale
+  if (svg.select('#povertyGrad')) {
+    const gradient = svgLegend.append('defs').append('linearGradient');
+    gradient.attr('id', 'povertyGrad')
+      .attr('y1', '0%')
+      .attr('x1', '0%')
+      .attr('y2', '0%')
+      .attr('x2', '100%');
+    gradient.append('stop')
+      .attr('offset', '0%')
+      .attr('style', 'stop-color:rgb(255, 180, 180);stop-opacity:1');
+    gradient.append('stop')
+      .attr('offset', '100%')
+      .attr('style', 'stop-color:rgb(75, 0, 0);stop-opacity:1');
+  }
+
   const max = Math.ceil(d3.max(dataSet, d => parseFloat(d.PovertyRate)));
   const min = Math.floor(d3.min(dataSet, d => parseFloat(d.PovertyRate)));
+
   scaleColor = d3.scaleLinear()
     .domain([min, max])
-    .range([155, 0]);
+    .range([180, 0]);
 
   // update and transition the new values
   const dataValue = 'PovertyRate';
-  visMap(dataValue);
+  visMap(dataValue, 80, 0, 0);
 
   // update legend
   const text = {
     text: 'Poverty Rate',
     x: width - 170,
   };
-  visLegend(text, { min: `${min}%`, x: width - 230 }, `${max}%`);
+  visLegend(text, { min: `${min}%`, x: width - 230 }, `${max}%`, 'povertyGrad');
 };
 
 const visChildPoverty = () => {
   // set the gradient scale
+  if (svg.select('#childGrad')) {
+    const gradient = svgLegend.append('defs').append('linearGradient');
+    gradient.attr('id', 'childGrad')
+      .attr('y1', '0%')
+      .attr('x1', '0%')
+      .attr('y2', '0%')
+      .attr('x2', '100%');
+    gradient.append('stop')
+      .attr('offset', '0%')
+      .attr('style', 'stop-color:rgb(255, 220, 180);stop-opacity:1');
+    gradient.append('stop')
+      .attr('offset', '100%')
+      .attr('style', 'stop-color:rgb(80, 40, 0);stop-opacity:1');
+  }
+
   const max = Math.ceil(d3.max(dataSet, d => parseFloat(d.ChildProvertyRate)));
   const min = Math.floor(d3.min(dataSet, d => parseFloat(d.ChildProvertyRate)));
+
   scaleColor = d3.scaleLinear()
     .domain([min, max])
-    .range([155, 0]);
+    .range([180, 0]);
 
   // update and transition the new values
   const dataValue = 'ChildProvertyRate';
-  visMap(dataValue);
+  visMap(dataValue, 80, 40, 0);
 
   // update legend
   const text = {
     text: 'Child Poverty Rate',
     x: width - 195,
   };
-  visLegend(text, { min: `${min}%`, x: width - 240 }, `${max}%`);
+  visLegend(text, { min: `${min}%`, x: width - 240 }, `${max}%`, 'childGrad');
 };
 
 const visHighSchoolGrad = () => {
   // set the gradient scale
+  if (svg.select('#highSchoolGrad')) {
+    const gradient = svgLegend.append('defs').append('linearGradient');
+    gradient.attr('id', 'highSchoolGrad')
+      .attr('y1', '0%')
+      .attr('x1', '0%')
+      .attr('y2', '0%')
+      .attr('x2', '100%');
+    gradient.append('stop')
+      .attr('offset', '0%')
+      .attr('style', 'stop-color:rgb(180, 180, 255);stop-opacity:1');
+    gradient.append('stop')
+      .attr('offset', '100%')
+      .attr('style', 'stop-color:rgb(0, 0, 80);stop-opacity:1');
+  }
   const max = Math.ceil(d3.max(dataSet, d => parseFloat(d.HighSchoolGradRate)));
   const min = Math.floor(d3.min(dataSet, d => parseFloat(d.HighSchoolGradRate)));
+
   scaleColor = d3.scaleLinear()
     .domain([min, max])
-    .range([0, 155]);
+    .range([180, 0]);
 
   // update and transition the new values
   const dataValue = 'HighSchoolGradRate';
-  visMap(dataValue);
+  visMap(dataValue, 0, 0, 80);
 
   // update legend
   const legend = {
@@ -175,23 +227,37 @@ const visHighSchoolGrad = () => {
       x: width - 240,
     },
     max: `${max}%`,
-    type: 'gradientType2',
+    type: 'highSchoolGrad',
   };
   visLegend(legend.text, legend.min, legend.max, legend.type);
 };
 
 const visHigherEdu = () => {
   // set the gradient scale
+  if (svg.select('#higherEduGrad')) {
+    const gradient = svgLegend.append('defs').append('linearGradient');
+    gradient.attr('id', 'higherEduGrad')
+      .attr('y1', '0%')
+      .attr('x1', '0%')
+      .attr('y2', '0%')
+      .attr('x2', '100%');
+    gradient.append('stop')
+      .attr('offset', '0%')
+      .attr('style', 'stop-color:rgb(180, 255, 255);stop-opacity:1');
+    gradient.append('stop')
+      .attr('offset', '100%')
+      .attr('style', 'stop-color:rgb(0, 80, 80);stop-opacity:1');
+  }
   const max = Math.ceil(d3.max(dataSet, d => parseFloat(d.HigherEducationRate)));
   const min = Math.floor(d3.min(dataSet, d => parseFloat(d.HigherEducationRate)));
 
   scaleColor = d3.scaleLinear()
     .domain([min, max])
-    .range([0, 155]);
+    .range([180, 0]);
 
   // update and transition the new values
   const dataValue = 'HigherEducationRate';
-  visMap(dataValue);
+  visMap(dataValue, 0, 80, 80);
 
   // update legend
   const legend = {
@@ -204,23 +270,37 @@ const visHigherEdu = () => {
       x: width - 240,
     },
     max: `${max}%`,
-    type: 'gradientType2',
+    type: 'higherEduGrad',
   };
   visLegend(legend.text, legend.min, legend.max, legend.type);
 };
 
 const visExpendPerStudent = () => {
   // nearest 100
+  if (svg.select('#expendPerStudentGrad')) {
+    const gradient = svgLegend.append('defs').append('linearGradient');
+    gradient.attr('id', 'expendPerStudentGrad')
+      .attr('y1', '0%')
+      .attr('x1', '0%')
+      .attr('y2', '0%')
+      .attr('x2', '100%');
+    gradient.append('stop')
+      .attr('offset', '0%')
+      .attr('style', 'stop-color:rgb(180, 255, 180);stop-opacity:1');
+    gradient.append('stop')
+      .attr('offset', '100%')
+      .attr('style', 'stop-color:rgb(0, 80, 0);stop-opacity:1');
+  }
   const max = Math.ceil(d3.max(dataSet, d => d.ExpendPerStudent) / 100) * 100;
   const min = Math.floor(d3.min(dataSet, d => d.ExpendPerStudent) / 100) * 100;
 
   scaleColor = d3.scaleLinear()
     .domain([min, max])
-    .range([0, 155]);
+    .range([180, 0]);
 
   // update and transition the new values
   const dataValue = 'ExpendPerStudent';
-  visMap(dataValue);
+  visMap(dataValue, 0, 80, 0);
 
   // update legend
   const legend = {
@@ -233,7 +313,7 @@ const visExpendPerStudent = () => {
       x: width - 255,
     },
     max: `$${numberWithCommas(max)}`,
-    type: 'gradientType2',
+    type: 'expendPerStudentGrad',
   };
   visLegend(legend.text, legend.min, legend.max, legend.type);
 };
@@ -289,34 +369,9 @@ const setupMap = (us) => {
 
 const setupLegend = () => {
   // Legend
-  const legend = svg.append('g');
-  const gradientType1 = legend.append('defs').append('linearGradient');
-  gradientType1.attr('id', 'gradientType1')
-    .attr('y1', '0%')
-    .attr('x1', '0%')
-    .attr('y2', '0%')
-    .attr('x2', '100%');
-  gradientType1.append('stop')
-    .attr('offset', '0%')
-    .attr('style', 'stop-color:rgb(255, 175, 175);stop-opacity:1');
-  gradientType1.append('stop')
-    .attr('offset', '100%')
-    .attr('style', 'stop-color:rgb(100, 0, 0);stop-opacity:1');
+  svgLegend = svg.append('g');
 
-  const gradientType2 = legend.append('defs').append('linearGradient');
-  gradientType2.attr('id', 'gradientType2')
-    .attr('y1', '0%')
-    .attr('x1', '0%')
-    .attr('y2', '0%')
-    .attr('x2', '100%');
-  gradientType2.append('stop')
-    .attr('offset', '0%')
-    .attr('style', 'stop-color:rgb(100, 0, 0);stop-opacity:1');
-  gradientType2.append('stop')
-    .attr('offset', '100%')
-    .attr('style', 'stop-color:rgb(255, 175, 175);stop-opacity:1');
-
-  legend.append('rect')
+  svgLegend.append('rect')
     .attr('id', 'legendGradient')
     .attr('y', 10)
     .attr('x', width - 200)
@@ -325,23 +380,23 @@ const setupLegend = () => {
     .attr('stroke', 'black')
     .attr('fill', 'url(#gradientType1)');
 
-  legend.append('text')
+  svgLegend.append('text')
     .attr('id', 'legendMin')
     .attr('y', 25)
     .attr('x', width - 230)
     .text('0%');
 
-  legend.append('text')
+  svgLegend.append('text')
     .attr('id', 'legendMax')
     .attr('y', 25)
     .attr('x', width - 50)
     .text('30%');
 
-  legend.append('text')
+  svgLegend.append('text')
     .attr('id', 'legendText')
     .attr('y', 0)
     .attr('x', width - 170)
-    .text(legendText);
+    .text('Poverty Rate');
 };
 
 const setupTooltips = () => {
