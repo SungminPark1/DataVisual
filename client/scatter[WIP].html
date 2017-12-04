@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-<html>
-<meta charset="utf-8">
 <style>
 body {
   font: 11px sans-serif;
@@ -25,7 +23,7 @@ body {
 }
 </style>
 <body>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js"></script>
 
 <script>
 	var margin = {top: 20, right: 20, bottom: 30, left: 40},
@@ -61,8 +59,10 @@ body {
 		.style("opacity", 0);
 //==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========
 
+	
+
 	// load data TODO
-	d3.csv("URLToData", function(error, data) 
+	d3.csv("data.csv", function(error, data) 
 	{
 	  // don't want dots overlapping axis, so add in buffer to data domain
 	  xScale.domain([d3.min(data, xValue)-1, d3.max(data, xValue)+1]);
@@ -102,12 +102,12 @@ body {
 		  .attr("r", 3.5)
 		  .attr("cx", xMap)
 		  .attr("cy", yMap)
-		  .style("fill", function(d) { return color(cValue(d));}) 
+		 /* .style("fill", function(d) { return color(cValue(d));}) */
 		  .on("mouseover", function(d) {
 			  tooltip.transition()
 				   .duration(200)
 				   .style("opacity", .9);
-			  tooltip.html(d.State + "<br/> (" + xValue(d) 
+			  tooltip.html(d.State + "<br/> (" + d.PovertyRate 
 				+ ", " + yValue(d) + ")")
 				   .style("left", (d3.event.pageX + 5) + "px")
 				   .style("top", (d3.event.pageY - 28) + "px");
@@ -117,8 +117,7 @@ body {
 				   .duration(500)
 				   .style("opacity", 0);
 		  });
-	}
+	})
 </script>
 
 </body>
-</html>
