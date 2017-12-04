@@ -30,12 +30,14 @@ body {
 		width = 960 - margin.left - margin.right,
 		height = 500 - margin.top - margin.bottom;
 		
-	var xValue = function(d) { return d.PovertyRate;},
+	var xValue = function(d) { return parseFloat(d.PovertyRate);},
 		xScale = d3.scale.linear().range([0, width]),
-		xMap = function(d) { return xScale(xValue(d));},
+		xMap = function(d) { 
+			return xScale(xValue(d));
+			},
 		xAxis = d3.svg.axis().scale(xScale).orient("bottom");
 		
-	var yValue = function(d) { return d.HigherEducationRate;},
+	var yValue = function(d) { return parseFloat(d.HigherEducationRate);},
 		yScale = d3.scale.linear().range([height, 0]),
 		yMap = function(d) { return yScale(yValue(d));},
 		yAxis = d3.svg.axis().scale(yScale).orient("left");
