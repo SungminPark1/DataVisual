@@ -1,49 +1,46 @@
-/* <button id="overviewControls">Overview</button>
-    <button id="compareControls">Compare</button>
-    */
+/*
+  <button id="overviewControls">Overview</button>
+  <button id="compareControls">Compare</button>
+*/
 
-    window.init = function() {
-        var overviewBtn = document.querySelector("#overviewControls");
-        var compareBtn = document.querySelector("#compareControls");
-        var mapDiv = document.querySelector(".svg__map");
-        var scatterDiv = document.querySelector(".svg__scatter")
+const controlInit = () => {
+  const overviewBtn = document.querySelector('#overviewBtn');
+  const compareBtn = document.querySelector('#compareBtn');
+  const overViewControls = document.querySelector('.overview__controls');
+  const mapDiv = document.querySelector('.svg__map');
+  const scatterDiv = document.querySelector('.svg__scatter');
 
-        scatterDiv.style.opacity = 0;
-        scatterDiv.style.zIndex = 0;
-        //display map if not displayed and hide scatter if displayed
-        overviewBtn.addEventListener("click",function(){
-            console.log("overview clicked");
-            mapDiv.style.opacity = 1;
-            mapDiv.style.zIndex = 1;
+  overviewBtn.style.backgroundColor = 'rgb(200, 200, 200)';
 
-            scatterDiv.style.opacity = 0;
-            scatterDiv.style.zIndex = 0;
-            /*mapDiv.style = {
-                opacity: 1,
-                zIndex: 1
-            }
-            scatterDiv.style = {
-                opacity: 0,
-                zIndex: 0
-            }*/
-        });
+  // display map if not displayed and hide scatter if displayed
+  overviewBtn.addEventListener('click', () => {
+    // map related styles
+    overviewBtn.style.backgroundColor = 'rgb(200, 200, 200)';
+    mapDiv.style.opacity = 1;
+    mapDiv.style.zIndex = 5;
+    overViewControls.style.opacity = 1;
+    overViewControls.style.zIndex = 5;
 
-        compareBtn.addEventListener("click",function(){
-            console.log("compare clicked");
+    // scatter related styles
+    compareBtn.style.backgroundColor = 'rgb(255, 255, 255)';
+    scatterDiv.style.opacity = 0;
+    scatterDiv.style.zIndex = 0;
+  });
 
-            mapDiv.style.opacity = 0;
-            mapDiv.style.zIndex = 0;
+  compareBtn.addEventListener('click', () => {
+    // map related styles
+    overviewBtn.style.backgroundColor = 'rgb(255, 255, 255)';
+    mapDiv.style.opacity = 0;
+    mapDiv.style.zIndex = 0;
+    overViewControls.style.opacity = 0;
+    overViewControls.style.zIndex = 0;
 
-            scatterDiv.style.opacity = 1;
-            scatterDiv.style.zIndex = 1;
+    // scatter related styles
+    compareBtn.style.backgroundColor = 'rgb(200, 200, 200)';
+    scatterDiv.style.opacity = 1;
+    scatterDiv.style.zIndex = 5;
+  });
+};
 
-           /* mapDiv.style = {
-                opacity: 0,
-                zIndex: 0
-            }
-            scatterDiv.style = {
-                opacity: 1,
-                zIndex: 1
-            }*/
-        });
-    }();
+window.addEventListener('load', controlInit);
+
