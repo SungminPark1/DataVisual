@@ -1,7 +1,7 @@
 window.addEventListener('load', function() {
-    var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    var padding = "25px 20px 45px 430px",
+    width = 600,
+    height = 600;
 
     var xValue = function(d) { return parseFloat(d.PovertyRate);},
     xScale = d3.scaleLinear().range([0, width]),
@@ -23,10 +23,11 @@ window.addEventListener('load', function() {
 
     // add the graph canvas to the body of the webpage
     var svg = d3.select("div.svg__scatter").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("width", width)
+    .attr("height", height)
+	.style("padding", padding )
+    .append("g");
+    //.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     console.log("appended SVG of " + svg);
 
@@ -75,9 +76,10 @@ window.addEventListener('load', function() {
     .data(data)
     .enter().append("circle")
     .attr("class", "dot")
-    .attr("r", 3.5)
+    .attr("r", 7.0)
     .attr("cx", xMap)
     .attr("cy", yMap)
+	.attr("fill", "rgba(0, 0, 0, .5)")
     /* .style("fill", function(d) { return color(cValue(d));}) */
     .on("mouseover", function(d) {
         tooltip.transition()

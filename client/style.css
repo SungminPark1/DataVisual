@@ -19,6 +19,7 @@ body {
   width: 960px;
   height: 600px;
   display: inline-block;
+  background-color: white;
 }
 
 .svg__scatter {
