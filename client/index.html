@@ -45,6 +45,14 @@
               <label>Education expend per student</label>
             </div>
           </div>
+          <div class="compare_controls">
+            <label for="yAxis_Select">YAxis Variable</label>
+            <select name="yAxis_Select" onchange="report(this.value)"> 
+              <option value="HigherEducationRate">Higher Education Rate</option>
+              <option value="ExpendForEduc">Education Expendutare</option>
+              <option value="AveragePerStudent">Spending Per Student</option>
+            </select>
+          </div>
         </div>
       </div>
       <div class="text__container">

@@ -81,6 +81,17 @@ body {
   height: 200px;
 }
 
+.compare_controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin-left: 12px;
+  height: 200px;
+  margin-top: -200px;
+  opacity: 0;
+  z-index: 0;
+}
+
 .overview__controls {
   transition: opacity 400ms ease-in;
 }
@@ -116,4 +127,8 @@ text {
   padding-right: 80px;
   width: 900px;
   background-color: white;
+}
+
+select {
+  z-index: 10;
 }

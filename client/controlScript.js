@@ -7,6 +7,7 @@ const controlInit = () => {
   const overviewBtn = document.querySelector('#overviewBtn');
   const compareBtn = document.querySelector('#compareBtn');
   const overViewControls = document.querySelector('.overview__controls');
+  const compareViewControls = document.querySelector('.compare_controls');
   const mapDiv = document.querySelector('.svg__map');
   const scatterDiv = document.querySelector('.svg__scatter');
 
@@ -25,6 +26,8 @@ const controlInit = () => {
     compareBtn.style.backgroundColor = 'rgb(255, 255, 255)';
     scatterDiv.style.opacity = 0;
     scatterDiv.style.zIndex = 0;
+    compareViewControls.style.opacity = 0;
+    compareViewControls.style.zIndex = 0;
   });
 
   compareBtn.addEventListener('click', () => {
@@ -39,6 +42,8 @@ const controlInit = () => {
     compareBtn.style.backgroundColor = 'rgb(200, 200, 200)';
     scatterDiv.style.opacity = 1;
     scatterDiv.style.zIndex = 5;
+    compareViewControls.style.opacity = 1;
+    compareViewControls.style.zIndex = 5;
   });
 };
 
