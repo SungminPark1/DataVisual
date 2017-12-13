@@ -69,29 +69,22 @@ body {
 }
 
 .control__container h2 {
+  position: relative;
   margin-top: 0;
   text-align: center;
 }
 
-.overview__controls {
+.compare_controls {
+  opacity: 0;
+  z-index: 0;
+}
+
+.overview__controls, .compare_controls {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   margin-left: 12px;
   height: 200px;
-}
-
-.compare_controls {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  margin-left: 12px;
-  margin-top: -200px;
-  opacity: 0;
-  z-index: 0;
-}
-
-.overview__controls {
   transition: opacity 400ms ease-in;
 }
 
