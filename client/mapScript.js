@@ -1,4 +1,4 @@
-(() => {  
+(() => {
   /* global d3 */
   /* global topojson */
 
@@ -481,20 +481,61 @@
   };
 
   const setEvents = () => {
-    d3.select('#povertyButton')
-      .on('change', () => updateVis('povertyRate'));
+    const povertyBtn = document.querySelector('#povertyButton');
+    const childBtn = document.querySelector('#childProvertyButton');
+    const highSchoolBtn = document.querySelector('#highSchoolGradButton');
+    const higherEduBtn = document.querySelector('#higherEduButton');
+    const expendPerStudBtn = document.querySelector('#expendPerStudentButton');
 
-    d3.select('#childProvertyButton')
-      .on('change', () => updateVis('childProverty'));
+    povertyBtn.addEventListener('click', () => {
+      updateVis('povertyRate');
 
-    d3.select('#highSchoolGradButton')
-      .on('change', () => updateVis('highSchoolGrad'));
+      povertyBtn.className = 'button button__selected';
+      childBtn.className = 'button';
+      highSchoolBtn.className = 'button';
+      higherEduBtn.className = 'button';
+      expendPerStudBtn.className = 'button';
+    });
 
-    d3.select('#higherEduButton')
-      .on('change', () => updateVis('higherEdu'));
+    childBtn.addEventListener('click', () => {
+      updateVis('childProverty');
 
-    d3.select('#expendPerStudentButton')
-      .on('change', () => updateVis('expendPerStudent'));
+      povertyBtn.className = 'button';
+      childBtn.className = 'button button__selected';
+      highSchoolBtn.className = 'button';
+      higherEduBtn.className = 'button';
+      expendPerStudBtn.className = 'button';
+    });
+
+    highSchoolBtn.addEventListener('click', () => {
+      updateVis('highSchoolGrad');
+
+      povertyBtn.className = 'button';
+      childBtn.className = 'button';
+      highSchoolBtn.className = 'button button__selected';
+      higherEduBtn.className = 'button';
+      expendPerStudBtn.className = 'button';
+    });
+
+    higherEduBtn.addEventListener('click', () => {
+      updateVis('higherEdu');
+
+      povertyBtn.className = 'button';
+      childBtn.className = 'button';
+      highSchoolBtn.className = 'button';
+      higherEduBtn.className = 'button button__selected';
+      expendPerStudBtn.className = 'button';
+    });
+
+    expendPerStudBtn.addEventListener('click', () => {
+      updateVis('expendPerStudent');
+
+      povertyBtn.className = 'button';
+      childBtn.className = 'button';
+      highSchoolBtn.className = 'button';
+      higherEduBtn.className = 'button';
+      expendPerStudBtn.className = 'button button__selected';
+    });
   };
 
   const visualize = (error, us, data) => {

@@ -25,18 +25,18 @@ const controlInit = () => {
     // scatter related styles
     compareBtn.style.backgroundColor = 'rgb(255, 255, 255)';
     scatterDiv.style.opacity = 0;
-    scatterDiv.style.zIndex = 0;
+    scatterDiv.style.zIndex = -1;
     compareViewControls.style.opacity = 0;
-    compareViewControls.style.zIndex = 0;
+    compareViewControls.style.zIndex = -1;
   });
 
   compareBtn.addEventListener('click', () => {
     // map related styles
     overviewBtn.style.backgroundColor = 'rgb(255, 255, 255)';
     mapDiv.style.opacity = 0;
-    mapDiv.style.zIndex = 0;
+    mapDiv.style.zIndex = -1;
     overViewControls.style.opacity = 0;
-    overViewControls.style.zIndex = 0;
+    overViewControls.style.zIndex = -1;
 
     // scatter related styles
     compareBtn.style.backgroundColor = 'rgb(200, 200, 200)';
