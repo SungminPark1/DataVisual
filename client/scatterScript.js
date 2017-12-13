@@ -1,28 +1,4 @@
-var scatterInit = function(){
-    yDropDown.addEventListener("change", function() {
-        console.log(yDropDown.value);
-        var tempYValue;
-
-        if (yDropDown.value == "HigherEducationRate" ){
-            //currentY="Higher Education Rate";
-            tempYValue = function(d) { return parseFloat(d.HigherEducationRate);}
-        }
-        else if(yDropDown.value == "ExpendForEduc"){
-           // currentY = "Expendutre on Education";
-           tempYValue = function(d) { return parseFloat(d.ExpendForEduc);}
-        }
-        else if (yDropDown.value == "AveragePerStudent"){
-            //currentY = "Average Spending Per Student";
-            tempYValue = function(d) { return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));}
-        }
-
-        reDraw(tempData, tempYValue);
-    });
-
-    d3.queue()
-        .defer(d3.csv, '/assets/data.csv')
-        .await(draw);
-};
+/* eslint-disable */
 
 var padding = "25px 20px 45px 430px",
 width = 600,
@@ -39,7 +15,6 @@ var svg = d3.select("div.svg__scatter").append("svg")
 .attr("height", height)
 .style("padding", padding )
 .append("g");
-//.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 console.log("appended SVG of " + svg);
 
@@ -50,54 +25,80 @@ var tooltip = d3.select("div.svg__container").append("div")
 
 // data points
 var dotGroup;
+var axisRounding = 5;
 
 //==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========
 
+var scatterInit = function(){
+    yDropDown.addEventListener("change", function() {
+        var tempYValue;
 
-var draw = function draw(error, data){
+        if (yDropDown.value == "HigherEducationRate" ){
+            axisRounding = 5;
+            currentY="Higher Education Rate";
+            tempYValue = function(d) { return parseFloat(d.HigherEducationRate);}
+        }
+        else if(yDropDown.value == "ExpendForEduc"){
+            axisRounding = 1;
+            currentY = "Expendutre on Education";
+            tempYValue = function(d) { return parseFloat(d.ExpendForEduc);}
+        }
+        else if (yDropDown.value == "AveragePerStudent"){
+            axisRounding = 1000;
+            currentY = "Average Spending Per Student";
+            tempYValue = function(d) { return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));}
+        }
+
+        reDraw(tempData, tempYValue);
+    });
+
+    d3.queue()
+        .defer(d3.csv, '/assets/data.csv')
+        .await(visualize);
+};
+
+var visualize = function (error, data) {
     tempData = data;
-   // svg.selectAll("*").remove();
+
+    // svg.selectAll("*").remove();
 
     var xValue = function(d) {
-        console.log(d);
-        return parseFloat(d.PovertyRate);},
-    xScale = d3.scaleLinear().range([0, width]),
+        return parseFloat(d.PovertyRate);
+    },
     xMap = function(d) { 
         return xScale(xValue(d));
-        },
-    xAxis = d3.axisBottom(xScale);
+    },
+    xScale = d3.scaleLinear().range([0, width]);
+    xScale.domain([
+        Math.floor((d3.min(data, xValue)-1) / 2) * 2,
+        Math.ceil((d3.max(data, xValue)+1) / 2) *2 
+    ]);
+    var xAxis = d3.axisBottom(xScale)
+        .ticks(8)
+        .tickSize(-height);
 
-    console.log(xValue);
-
-    var yValue,
+    var yValue = function(d) { return parseFloat(d.HigherEducationRate)},
     yScale,
     yMap,
     yAxis;
 
-    if(currentY == "Higher Education Rate"){
-        yValue = function(d) { return parseFloat(d.HigherEducationRate);}
-    }
-    else if(currentY == "Expendutre on Education"){
-        yValue = function(d) { return parseFloat(d.ExpendForEduc);}
-       // yValue = parseFloat(data.ExpendForEdu);
-    }
-    else if(currentY == "Average Spending Per Student"){
-        yValue = function(d) { return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));}
-        //yValue = parseFloat(data.AveragePerStudent);
-    }
-
     yScale = d3.scaleLinear().range([height, 0]);
+    yScale.domain([
+        Math.floor((d3.min(data, yValue)-1) / axisRounding) * axisRounding,
+        Math.ceil((d3.max(data, yValue)+1) / axisRounding ) * axisRounding
+    ]);
     yMap = function(d) { return yScale(yValue(d));};
-    yAxis = d3.axisLeft(yScale);
+    yAxis = d3.axisLeft(yScale)
+        .ticks(8)
+        .tickSize(-width);
 
-    // don't want dots overlapping axis, so add in buffer to data domain
-    xScale.domain([d3.min(data, xValue)-1, d3.max(data, xValue)+1]);
-    yScale.domain([d3.min(data, yValue)-1, d3.max(data, yValue)+1]);
+    initDraw(data, xMap, yMap, xAxis, yAxis, xValue, yValue);
+};
 
-
+var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
     // x-axis
     svg.append("g")
-    .attr("class", "x axis")
+    .attr("class", "x__axis")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis)
     .append("text")
@@ -105,11 +106,13 @@ var draw = function draw(error, data){
     .attr("x", width)
     .attr("y", -6)
     .style("text-anchor", "end")
-    .text("Poverty Rate");
+    .text("Poverty Rate")
+    .selectAll('.tick:not(:first-of-type) line')
+    .attr('stroke', '#BABABA');
     
     // y-axis
     svg.append("g")
-    .attr("class", "y axis")
+    .attr("class", "y__axis")
     .call(yAxis)
     .append("text")
     .attr("class", "label")
@@ -120,7 +123,9 @@ var draw = function draw(error, data){
     //.style("text-anchor", "Start")
     .attr("alignment-baseline", "hanging")
     .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
-    .text(currentY);
+    .text(currentY || 'var name')
+    .selectAll('.tick:not(:first-of-type) line')
+    .attr('stroke', '#BABABA');
     
     dotGroup = svg.append('g');
     // draw dots
@@ -147,51 +152,49 @@ var draw = function draw(error, data){
                 .duration(500)
                 .style("opacity", 0);
         });
-}
+};
 
-var reDraw = function(data, yValue){
-    var xValue = function(d) {
-        console.log(d);
-        return parseFloat(d.PovertyRate);},
-    xScale = d3.scaleLinear().range([0, width]),
-    xMap = function(d) { 
-        return xScale(xValue(d));
-        },
-    xAxis = d3.axisBottom(xScale);
-
-    console.log(xValue);
-
-   // var yValue,
-    yScale,
+var reDraw = function(data, yValue) {
+    var yScale,
     yMap,
     yAxis;
 
-    if(currentY == "Higher Education Rate"){
-        yValue = function(d) { return parseFloat(d.HigherEducationRate);}
-    }
-    else if(currentY == "Expendutre on Education"){
-        yValue = function(d) { return parseFloat(d.ExpendForEduc);}
-       // yValue = parseFloat(data.ExpendForEdu);
-    }
-    else if(currentY == "Average Spending Per Student"){
-        yValue = function(d) { return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));}
-        //yValue = parseFloat(data.AveragePerStudent);
-    }
-
     yScale = d3.scaleLinear().range([height, 0]);
-    yMap = function(d) { return yScale(yValue(d));};
-    yAxis = d3.axisLeft(yScale);
-
     // don't want dots overlapping axis, so add in buffer to data domain
-    xScale.domain([d3.min(data, xValue)-1, d3.max(data, xValue)+1]);
-    yScale.domain([d3.min(data, yValue)-1, d3.max(data, yValue)+1]);
+    yScale.domain([
+        Math.floor((d3.min(data, yValue)-1) / axisRounding) * axisRounding,
+        Math.ceil((d3.max(data, yValue)+1) / axisRounding ) * axisRounding
+    ]);
+
+    yMap = function(d) { return yScale(yValue(d));};
+    yAxis = d3.axisLeft(yScale)
+        .ticks(8)
+        .tickSize(-width);
+
+    // y-axis
+    svg.selectAll('.y__axis').remove();
+    svg.append("g")
+    .attr("class", "y__axis")
+    .call(yAxis)
+    .append("text")
+    .attr("class", "label")
+    .attr("transform", "translate(20, 300)")        
+    //.attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    //.style("text-anchor", "Start")
+    .attr("alignment-baseline", "hanging")
+    .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
+    .text(currentY)
+    .selectAll('.tick:not(:first-of-type) line')
+    .attr('stroke', '#BABABA');
 
     dotGroup.selectAll(".dot")
         .data(data)
         .merge(dotGroup)
         .transition()
         .duration(400)
-        .attr("cx", xMap)
         .attr("cy", yMap);
- }
+};
+
 window.addEventListener('load', scatterInit);
