@@ -25,31 +25,89 @@ var tooltip = d3.select("div.svg__container").append("div")
 
 // data points
 var dotGroup;
-var axisRounding = 5;
+var axisRoundingY = 5;
+var axisRoundingX = 1000;
+
+var currentX = "Spending Per Student";
+
+var presetButtonA = document.querySelector("#scatter_preset_a");
+var presetButtonB = document.querySelector("#scatter_preset_b")
+var presetButtonC = document.querySelector("#scatter_preset_c")
 
 //==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========
 
 var scatterInit = function(){
     yDropDown.addEventListener("change", function() {
         var tempYValue;
+        var xValue = function(d) {
+            return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));
+       };
+       currentX="Spending per student";
 
         if (yDropDown.value == "HigherEducationRate" ){
-            axisRounding = 5;
+            axisRoundingY = 5;
             currentY="Higher Education Rate";
             tempYValue = function(d) { return parseFloat(d.HigherEducationRate);}
         }
-        else if(yDropDown.value == "ExpendForEduc"){
-            axisRounding = 1;
-            currentY = "Expendutre on Education";
-            tempYValue = function(d) { return parseFloat(d.ExpendForEduc);}
+        else if(yDropDown.value == "PovertyRate"){
+            axisRoundingY = 1;
+            currentY = "Poverty Rate";
+            tempYValue = function(d) { return parseFloat(d.PovertyRate);}
         }
-        else if (yDropDown.value == "AveragePerStudent"){
-            axisRounding = 1000;
-            currentY = "Average Spending Per Student";
-            tempYValue = function(d) { return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));}
+        else if (yDropDown.value == "HighSchoolGradRate"){
+            axisRoundingY = 3;
+            currentY = "High School Graduation Rate";
+            tempYValue = function(d) { return (parseFloat(d.HighSchoolGradRate));}
         }
+        else if (yDropDown.value == "UnemploymentRate"){
+            axisRoundingY = 1;
+            currentY = "Unemployment Rate";
+            tempYValue = function(d) { return (parseFloat(d.UnemploymentRate));}
+        }
+        else if (yDropDown.value == "studentsPerTeacher"){
+            axisRoundingY = 1;
+            currentY = "Students Per Teacher";
+            tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
+        }
+        
+        reDraw(tempData, tempYValue, xValue);
+    });
 
-        reDraw(tempData, tempYValue);
+    presetButtonA.addEventListener('click', function(){
+        axisRoundingY = 2;
+        axisRoundingx = 1;
+
+        currentY = "Students Per Teacher";
+        currentX = "Poverty Rate";
+      
+        tempXValue = function(d) { return parseFloat(d.PovertyRate);}
+        tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
+     
+        reDraw(tempData, tempYValue, tempXValue);
+    });
+    presetButtonB.addEventListener('click', function(){
+        axisRoundingY = 5;
+        axisRoundingx = 1;
+
+        currentY = "Higher Education Rate";
+        currentX = "Unemployment Rate";
+      
+        tempYValue = function(d) {  return parseFloat(d.HigherEducationRate);}
+        tempXValue = function(d) { return parseFloat(d.UnemploymentRate);}
+       
+        reDraw(tempData, tempYValue, tempXValue);
+    });
+    presetButtonC.addEventListener('click', function(){
+        axisRoundingY = 2;
+        axisRoundingx = 1;
+
+        currentY = "Highschool Grad Rate";
+        currentX = "Poverty Rate";
+      
+        tempXValue = function(d) { return parseFloat(d.PovertyRate);}
+        tempYValue = function(d) {  return parseFloat(d.HighSchoolGradRate);}
+     
+        reDraw(tempData, tempYValue, tempXValue);
     });
 
     d3.queue()
@@ -63,15 +121,15 @@ var visualize = function (error, data) {
     // svg.selectAll("*").remove();
 
     var xValue = function(d) {
-        return parseFloat(d.PovertyRate);
+         return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));
     },
     xMap = function(d) { 
         return xScale(xValue(d));
     },
     xScale = d3.scaleLinear().range([0, width]);
     xScale.domain([
-        Math.floor((d3.min(data, xValue)-1) / 2) * 2,
-        Math.ceil((d3.max(data, xValue)+1) / 2) *2 
+        Math.floor((d3.min(data, xValue)-1) / axisRoundingX) * axisRoundingX,
+        Math.ceil((d3.max(data, xValue)+1) / axisRoundingX) *axisRoundingX 
     ]);
     var xAxis = d3.axisBottom(xScale)
         .ticks(8)
@@ -84,8 +142,8 @@ var visualize = function (error, data) {
 
     yScale = d3.scaleLinear().range([height, 0]);
     yScale.domain([
-        Math.floor((d3.min(data, yValue)-1) / axisRounding) * axisRounding,
-        Math.ceil((d3.max(data, yValue)+1) / axisRounding ) * axisRounding
+        Math.floor((d3.min(data, yValue)-1) / axisRoundingY) * axisRoundingY,
+        Math.ceil((d3.max(data, yValue)+1) / axisRoundingY ) * axisRoundingY
     ]);
     yMap = function(d) { return yScale(yValue(d));};
     yAxis = d3.axisLeft(yScale)
@@ -106,7 +164,7 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
     .attr("x", width)
     .attr("y", -6)
     .style("text-anchor", "end")
-    .text("Poverty Rate")
+    .text(currentX)
     .selectAll('.tick:not(:first-of-type) line')
     .attr('stroke', '#BABABA');
     
@@ -154,7 +212,19 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
         });
 };
 
-var reDraw = function(data, yValue) {
+var reDraw = function(data, yValue, xValue) {
+    xMap = function(d) { 
+        return xScale(xValue(d));
+    },
+    xScale = d3.scaleLinear().range([0, width]);
+    xScale.domain([
+        Math.floor((d3.min(data, xValue)-1) / axisRoundingX) * axisRoundingX,
+        Math.ceil((d3.max(data, xValue)+1) / axisRoundingX) *axisRoundingX 
+    ]);
+    var xAxis = d3.axisBottom(xScale)
+    .ticks(8)
+    .tickSize(-height);
+
     var yScale,
     yMap,
     yAxis;
@@ -162,14 +232,29 @@ var reDraw = function(data, yValue) {
     yScale = d3.scaleLinear().range([height, 0]);
     // don't want dots overlapping axis, so add in buffer to data domain
     yScale.domain([
-        Math.floor((d3.min(data, yValue)-1) / axisRounding) * axisRounding,
-        Math.ceil((d3.max(data, yValue)+1) / axisRounding ) * axisRounding
+        Math.floor((d3.min(data, yValue)-1) / axisRoundingY) * axisRoundingY,
+        Math.ceil((d3.max(data, yValue)+1) / axisRoundingY ) * axisRoundingY
     ]);
 
     yMap = function(d) { return yScale(yValue(d));};
     yAxis = d3.axisLeft(yScale)
         .ticks(8)
         .tickSize(-width);
+
+    //x-axis
+    svg.selectAll('.x__axis').remove();
+    svg.append("g")
+    .attr("class", "x__axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+    .append("text")
+    .attr("class", "label")
+    .attr("x", width)
+    .attr("y", -6)
+    .style("text-anchor", "end")
+    .text(currentX)
+    .selectAll('.tick:not(:first-of-type) line')
+    .attr('stroke', '#BABABA');
 
     // y-axis
     svg.selectAll('.y__axis').remove();
