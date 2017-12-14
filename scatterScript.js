@@ -1,0 +1,285 @@
+/* eslint-disable */
+
+var padding = "25px 20px 45px 430px",
+width = 600,
+height = 600;
+
+var currentY = "Higher Education Rate";
+var yDropDown = document.querySelector("#y_select");
+
+var tempData;
+
+// add the graph canvas to the body of the webpage
+var svg = d3.select("div.svg__scatter").append("svg")
+.attr("width", width)
+.attr("height", height)
+.style("padding", padding )
+.append("g");
+
+console.log("appended SVG of " + svg);
+
+// add the tooltip area to the webpage
+var tooltip = d3.select("div.svg__container").append("div")
+.attr("class", "tooltip")
+.style("opacity", 0);
+
+// data points
+var dotGroup;
+var axisRoundingY = 5;
+var axisRoundingX = 1000;
+
+var currentX = "Spending Per Student";
+
+var presetButtonA = document.querySelector("#scatter_preset_a");
+var presetButtonB = document.querySelector("#scatter_preset_b")
+var presetButtonC = document.querySelector("#scatter_preset_c")
+
+//==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========End Vars==========
+
+var scatterInit = function(){
+    yDropDown.addEventListener("change", function() {
+        var tempYValue;
+        var xValue = function(d) {
+            return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));
+       };
+       currentX="Spending per student";
+
+        if (yDropDown.value == "HigherEducationRate" ){
+            axisRoundingY = 5;
+            currentY="Higher Education Rate";
+            tempYValue = function(d) { return parseFloat(d.HigherEducationRate);}
+        }
+        else if(yDropDown.value == "PovertyRate"){
+            axisRoundingY = 1;
+            currentY = "Poverty Rate";
+            tempYValue = function(d) { return parseFloat(d.PovertyRate);}
+        }
+        else if (yDropDown.value == "HighSchoolGradRate"){
+            axisRoundingY = 3;
+            currentY = "High School Graduation Rate";
+            tempYValue = function(d) { return (parseFloat(d.HighSchoolGradRate));}
+        }
+        else if (yDropDown.value == "UnemploymentRate"){
+            axisRoundingY = 1;
+            currentY = "Unemployment Rate";
+            tempYValue = function(d) { return (parseFloat(d.UnemploymentRate));}
+        }
+        else if (yDropDown.value == "studentsPerTeacher"){
+            axisRoundingY = 1;
+            currentY = "Students Per Teacher";
+            tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
+        }
+        
+        reDraw(tempData, tempYValue, xValue);
+    });
+
+    presetButtonA.addEventListener('click', function(){
+        axisRoundingY = 2;
+        axisRoundingx = 1;
+
+        currentY = "Students Per Teacher";
+        currentX = "Poverty Rate";
+      
+        tempXValue = function(d) { return parseFloat(d.PovertyRate);}
+        tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
+     
+        reDraw(tempData, tempYValue, tempXValue);
+    });
+    presetButtonB.addEventListener('click', function(){
+        axisRoundingY = 5;
+        axisRoundingx = 1;
+
+        currentY = "Higher Education Rate";
+        currentX = "Unemployment Rate";
+      
+        tempYValue = function(d) {  return parseFloat(d.HigherEducationRate);}
+        tempXValue = function(d) { return parseFloat(d.UnemploymentRate);}
+       
+        reDraw(tempData, tempYValue, tempXValue);
+    });
+    presetButtonC.addEventListener('click', function(){
+        axisRoundingY = 2;
+        axisRoundingx = 1;
+
+        currentY = "Highschool Grad Rate";
+        currentX = "Poverty Rate";
+      
+        tempXValue = function(d) { return parseFloat(d.PovertyRate);}
+        tempYValue = function(d) {  return parseFloat(d.HighSchoolGradRate);}
+     
+        reDraw(tempData, tempYValue, tempXValue);
+    });
+
+    d3.queue()
+        .defer(d3.csv, '/assets/data.csv')
+        .await(visualize);
+};
+
+var visualize = function (error, data) {
+    tempData = data;
+
+    // svg.selectAll("*").remove();
+
+    var xValue = function(d) {
+         return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));
+    },
+    xMap = function(d) { 
+        return xScale(xValue(d));
+    },
+    xScale = d3.scaleLinear().range([0, width]);
+    xScale.domain([
+        Math.floor((d3.min(data, xValue)-1) / axisRoundingX) * axisRoundingX,
+        Math.ceil((d3.max(data, xValue)+1) / axisRoundingX) *axisRoundingX 
+    ]);
+    var xAxis = d3.axisBottom(xScale)
+        .ticks(8)
+        .tickSize(-height);
+
+    var yValue = function(d) { return parseFloat(d.HigherEducationRate)},
+    yScale,
+    yMap,
+    yAxis;
+
+    yScale = d3.scaleLinear().range([height, 0]);
+    yScale.domain([
+        Math.floor((d3.min(data, yValue)-1) / axisRoundingY) * axisRoundingY,
+        Math.ceil((d3.max(data, yValue)+1) / axisRoundingY ) * axisRoundingY
+    ]);
+    yMap = function(d) { return yScale(yValue(d));};
+    yAxis = d3.axisLeft(yScale)
+        .ticks(8)
+        .tickSize(-width);
+
+    initDraw(data, xMap, yMap, xAxis, yAxis, xValue, yValue);
+};
+
+var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
+    // x-axis
+    svg.append("g")
+    .attr("class", "x__axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+    .append("text")
+    .attr("class", "label")
+    .attr("x", width)
+    .attr("y", -6)
+    .style("text-anchor", "end")
+    .text(currentX)
+    .selectAll('.tick:not(:first-of-type) line')
+    .attr('stroke', '#BABABA');
+    
+    // y-axis
+    svg.append("g")
+    .attr("class", "y__axis")
+    .call(yAxis)
+    .append("text")
+    .attr("class", "label")
+    .attr("transform", "translate(20, 300)")        
+    //.attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    //.style("text-anchor", "Start")
+    .attr("alignment-baseline", "hanging")
+    .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
+    .text(currentY || 'var name')
+    .selectAll('.tick:not(:first-of-type) line')
+    .attr('stroke', '#BABABA');
+    
+    dotGroup = svg.append('g');
+    // draw dots
+    dotGroup.selectAll(".dot")
+        .data(data)
+        .enter()      
+        .append("circle")
+        .attr("class", "dot")
+        .attr("r", 7.0)
+        .attr("cx", xMap)
+        .attr("cy", yMap)
+        .attr("fill", "rgba(0, 0, 0, .5)")
+        .on("mouseover", function(d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltip.html(d.State + "<br/> (" + d.PovertyRate 
+                + ", " + yValue(d) + ")")
+                .style("left", (d3.event.pageX + 5) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+        .on("mouseout", function(d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+};
+
+var reDraw = function(data, yValue, xValue) {
+    xMap = function(d) { 
+        return xScale(xValue(d));
+    },
+    xScale = d3.scaleLinear().range([0, width]);
+    xScale.domain([
+        Math.floor((d3.min(data, xValue)-1) / axisRoundingX) * axisRoundingX,
+        Math.ceil((d3.max(data, xValue)+1) / axisRoundingX) *axisRoundingX 
+    ]);
+    var xAxis = d3.axisBottom(xScale)
+    .ticks(8)
+    .tickSize(-height);
+
+    var yScale,
+    yMap,
+    yAxis;
+
+    yScale = d3.scaleLinear().range([height, 0]);
+    // don't want dots overlapping axis, so add in buffer to data domain
+    yScale.domain([
+        Math.floor((d3.min(data, yValue)-1) / axisRoundingY) * axisRoundingY,
+        Math.ceil((d3.max(data, yValue)+1) / axisRoundingY ) * axisRoundingY
+    ]);
+
+    yMap = function(d) { return yScale(yValue(d));};
+    yAxis = d3.axisLeft(yScale)
+        .ticks(8)
+        .tickSize(-width);
+
+    //x-axis
+    svg.selectAll('.x__axis').remove();
+    svg.append("g")
+    .attr("class", "x__axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+    .append("text")
+    .attr("class", "label")
+    .attr("x", width)
+    .attr("y", -6)
+    .style("text-anchor", "end")
+    .text(currentX)
+    .selectAll('.tick:not(:first-of-type) line')
+    .attr('stroke', '#BABABA');
+
+    // y-axis
+    svg.selectAll('.y__axis').remove();
+    svg.append("g")
+    .attr("class", "y__axis")
+    .call(yAxis)
+    .append("text")
+    .attr("class", "label")
+    .attr("transform", "translate(20, 300)")        
+    //.attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    //.style("text-anchor", "Start")
+    .attr("alignment-baseline", "hanging")
+    .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
+    .text(currentY)
+    .selectAll('.tick:not(:first-of-type) line')
+    .attr('stroke', '#BABABA');
+
+    dotGroup.selectAll(".dot")
+        .data(data)
+        .merge(dotGroup)
+        .transition()
+        .duration(400)
+        .attr("cy", yMap);
+};
+
+window.addEventListener('load', scatterInit);
