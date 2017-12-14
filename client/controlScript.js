@@ -1,7 +1,10 @@
-/*
-  <button id="overviewControls">Overview</button>
-  <button id="compareControls">Compare</button>
-*/
+/* eslint-disable */
+
+// return word with space infront of capital letters TotalStudent -> Total Student
+const addSpace = str => str.replace(/([A-Z])/g, ' $1').trim();
+
+// return number with commas
+const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 const controlInit = () => {
   const overviewBtn = document.querySelector('#overviewBtn');

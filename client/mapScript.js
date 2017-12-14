@@ -1,6 +1,8 @@
 (() => {
   /* global d3 */
   /* global topojson */
+  /* global addSpace */
+  /* global numberWithCommas */
 
   // Width and height
   const width = 960;
@@ -75,12 +77,6 @@
     56: 'WY',
   };
   let states;
-
-  // return word with space infront of capital letters TotalStudent -> Total Student
-  const addSpace = str => str.replace(/([A-Z])/g, ' $1').trim();
-
-  // return number with commas
-  const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
   const visMap = (dataValue, rOffset, gOffset, bOffset) => {
     states.transition()

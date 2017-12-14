@@ -120,6 +120,7 @@ var visualize = function (error, data) {
 
     // svg.selectAll("*").remove();
 
+    // Setup init x values
     var xValue = function(d) {
          return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));
     },
@@ -135,6 +136,7 @@ var visualize = function (error, data) {
         .ticks(8)
         .tickSize(-height);
 
+    // Setup init y values
     var yValue = function(d) { return parseFloat(d.HigherEducationRate)},
     yScale,
     yMap,
@@ -149,6 +151,24 @@ var visualize = function (error, data) {
     yAxis = d3.axisLeft(yScale)
         .ticks(8)
         .tickSize(-width);
+
+
+    // Setup watch tooltip (click event)
+    watchTooltip = svg.append('g');
+    watchTooltip.attr('class', 'watch__tooltip')
+        .attr('transform', 'translate(-410, 0)');
+    watchTooltip.append('rect')
+        .attr('x', 20)
+        .attr('y', 0)
+        .attr('height', 220)
+        .attr('width', 350)
+        .attr('fill', '#F0F0F0')
+        .attr('stroke', '#000');
+    watchTooltip.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('x', 195)
+        .attr('y', 20)
+        .text('Click Data to Watch');
 
     initDraw(data, xMap, yMap, xAxis, yAxis, xValue, yValue);
 };
@@ -195,7 +215,8 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
         .attr("r", 7.0)
         .attr("cx", xMap)
         .attr("cy", yMap)
-        .attr("fill", "rgba(0, 0, 0, .5)")
+        .attr("fill", "rgba(155, 155, 155, 1)")
+        .attr("stroke", "rgba(0, 0, 0, 1)")
         .on("mouseover", function(d) {
             tooltip.transition()
                 .duration(200)
@@ -209,7 +230,8 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
             tooltip.transition()
                 .duration(500)
                 .style("opacity", 0);
-        });
+        })
+        .on("click", updateWatchTooltip);
 };
 
 var reDraw = function(data, yValue, xValue) {
@@ -280,6 +302,78 @@ var reDraw = function(data, yValue, xValue) {
         .transition()
         .duration(400)
         .attr("cy", yMap);
+};
+
+var watchTooltip;
+var watchFirstCall = true;
+
+var updateWatchTooltip = function(d) {
+    // get the keys in object d
+    // filter out Abbr and UnemploymentRate
+    var keys = Object.keys(d).filter( function(key) {
+        return key !== 'Abbr' && key !== 'UnemploymentRate';
+    });
+
+    // add data if its the first call otherwise change the values with merge
+    if (watchFirstCall) {
+        watchTooltip.selectAll('text').remove();
+
+        watchFirstCall = false;
+        watchTooltip.selectAll('text')
+            .data(keys)
+            .enter()
+            .append('text')
+            .attr('x', 40)
+            .attr('y', function (key, i) {
+                return 45 + (i * 20);
+            })
+            .attr('style', 'opacity: 0')
+            .transition()
+            .duration(400)
+            .attr('style', 'opacity: 1')
+            .text(function (key, i) {
+              var dataValue = d[key] || 'N/A';
+
+              if (i > 4) {
+                dataValue = numberWithCommas(parseFloat(d[key]));
+              }
+
+              // add dollar symbol
+              if (i > 7) {
+                dataValue = `$${dataValue}`;
+              }
+
+              return `${addSpace(key)}: ${dataValue}`;
+            });
+
+        watchTooltip.append('text')
+            .attr('text-anchor', 'middle')
+            .attr('x', 195)
+            .attr('y', 20)
+            .text('Watching')
+            .attr('style', 'opacity: 0')
+            .transition()
+            .duration(400)
+            .attr('style', 'opacity: 1');
+    } else {
+        watchTooltip.selectAll('text')
+            .data(keys)
+            .merge(watchTooltip)
+            .text(function (key, i) {
+              var dataValue = d[key] || 'N/A';
+
+              if (i > 4) {
+                dataValue = numberWithCommas(parseFloat(d[key]));
+              }
+
+              // add dollar symbol
+              if (i > 7) {
+                dataValue = `$${dataValue}`;
+              }
+
+              return `${addSpace(key)}: ${dataValue}`;
+            });
+    }
 };
 
 window.addEventListener('load', scatterInit);
