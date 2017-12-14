@@ -16,6 +16,10 @@ var svg = d3.select("div.svg__scatter").append("svg")
 .style("padding", padding )
 .append("g");
 
+// grid
+var horizontalGrid;
+var verticalGrid;
+
 console.log("appended SVG of " + svg);
 
 // add the tooltip area to the webpage
@@ -25,6 +29,7 @@ var tooltip = d3.select("div.svg__container").append("div")
 
 // data points
 var dotGroup;
+var dotGroupText;
 var axisRoundingY = 5;
 var axisRoundingX = 1000;
 
@@ -175,8 +180,8 @@ var visualize = function (error, data) {
 
 var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
     // x-axis
-    svg.append("g")
-    .attr("class", "x__axis")
+    horizontalGrid = svg.append("g");
+    horizontalGrid.attr("class", "x__axis")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis)
     .append("text")
@@ -189,8 +194,8 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
     .attr('stroke', '#BABABA');
     
     // y-axis
-    svg.append("g")
-    .attr("class", "y__axis")
+    verticalGrid = svg.append("g");
+    verticalGrid.attr("class", "y__axis")
     .call(yAxis)
     .append("text")
     .attr("class", "label")
@@ -206,13 +211,15 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
     .attr('stroke', '#BABABA');
     
     dotGroup = svg.append('g');
+    dotGroupText = svg.append('g');
+
     // draw dots
     dotGroup.selectAll(".dot")
         .data(data)
         .enter()      
         .append("circle")
         .attr("class", "dot")
-        .attr("r", 7.0)
+        .attr("r", 15)
         .attr("cx", xMap)
         .attr("cy", yMap)
         .attr("fill", "rgba(155, 155, 155, 1)")
@@ -232,76 +239,109 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
                 .style("opacity", 0);
         })
         .on("click", updateWatchTooltip);
+
+    dotGroupText.selectAll('text')
+        .data(data)
+        .enter()
+        .append('text')
+        .attr("x", xMap)
+        .attr("y", yMap)
+        .style("font-size", "12px")
+        .style("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .style('pointer-events', 'none')
+        .text(function (d) {
+            return d.Abbr
+        });
 };
 
 var reDraw = function(data, yValue, xValue) {
-    xMap = function(d) { 
-        return xScale(xValue(d));
-    },
-    xScale = d3.scaleLinear().range([0, width]);
+    var xScale = d3.scaleLinear().range([0, width]);
     xScale.domain([
         Math.floor((d3.min(data, xValue)-1) / axisRoundingX) * axisRoundingX,
         Math.ceil((d3.max(data, xValue)+1) / axisRoundingX) *axisRoundingX 
     ]);
+    var xMap = function(d) { 
+        return xScale(xValue(d) || 0);
+    };
     var xAxis = d3.axisBottom(xScale)
     .ticks(8)
     .tickSize(-height);
 
-    var yScale,
-    yMap,
-    yAxis;
 
-    yScale = d3.scaleLinear().range([height, 0]);
+    var yScale = d3.scaleLinear().range([height, 0]);
     // don't want dots overlapping axis, so add in buffer to data domain
     yScale.domain([
         Math.floor((d3.min(data, yValue)-1) / axisRoundingY) * axisRoundingY,
         Math.ceil((d3.max(data, yValue)+1) / axisRoundingY ) * axisRoundingY
     ]);
 
-    yMap = function(d) { return yScale(yValue(d));};
-    yAxis = d3.axisLeft(yScale)
+    var yMap = function(d) { 
+        return yScale(yValue(d) || 0);
+    };
+    var yAxis = d3.axisLeft(yScale)
         .ticks(8)
         .tickSize(-width);
 
     //x-axis
-    svg.selectAll('.x__axis').remove();
-    svg.append("g")
-    .attr("class", "x__axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis)
-    .append("text")
-    .attr("class", "label")
-    .attr("x", width)
-    .attr("y", -6)
-    .style("text-anchor", "end")
-    .text(currentX)
-    .selectAll('.tick:not(:first-of-type) line')
-    .attr('stroke', '#BABABA');
+    horizontalGrid.selectAll('*').remove();
+    horizontalGrid.attr('opacity', 0)
+        .transition()
+        .duration(400)
+        .attr('opacity', 1);
+    horizontalGrid.call(xAxis)
+        .append("text")
+        .attr("class", "label")
+        .attr("x", width)
+        .attr("y", -6)
+        .style("text-anchor", "end")
+        .text(currentX)
+        .selectAll('.tick:not(:first-of-type) line')
+        .attr('stroke', '#BABABA')
+        .attr('opacity', 0)
+        .transition()
+        .duration(400)
+        .attr('opacity', 1);
 
     // y-axis
-    svg.selectAll('.y__axis').remove();
-    svg.append("g")
-    .attr("class", "y__axis")
-    .call(yAxis)
-    .append("text")
-    .attr("class", "label")
-    .attr("transform", "translate(20, 300)")        
-    //.attr("transform", "rotate(-90)")
-    .attr("y", 6)
-    .attr("dy", ".71em")
-    //.style("text-anchor", "Start")
-    .attr("alignment-baseline", "hanging")
-    .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
-    .text(currentY)
-    .selectAll('.tick:not(:first-of-type) line')
-    .attr('stroke', '#BABABA');
+    verticalGrid.selectAll('*').remove();
+    verticalGrid.attr('opacity', 0)
+        .transition()
+        .duration(400)
+        .attr('opacity', 1);
+    verticalGrid.call(yAxis)
+        .append("text")
+        .attr("class", "label")
+        .attr("transform", "translate(20, 300)")        
+        //.attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        //.style("text-anchor", "Start")
+        .attr("alignment-baseline", "hanging")
+        .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
+        .text(currentY)
+        .selectAll('.tick:not(:first-of-type) line')
+        .attr('stroke', '#BABABA')
+        .attr('opacity', 0)
+        .transition()
+        .duration(400)
+        .attr('opacity', 1);
 
     dotGroup.selectAll(".dot")
         .data(data)
         .merge(dotGroup)
         .transition()
         .duration(400)
-        .attr("cy", yMap);
+        .attr("cy", yMap || 0)
+        .attr("cx", xMap || 0);
+
+    dotGroupText.selectAll("text")
+        .data(data)
+        .merge(dotGroup)
+        .transition()
+        .duration(400)
+        .attr("y", yMap || 0)
+        .attr("x", xMap || 0);
 };
 
 var watchTooltip;
