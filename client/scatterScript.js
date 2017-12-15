@@ -1,4 +1,5 @@
 /* eslint-disable */
+'use strict';
 
 var padding = "25px 20px 45px 430px",
 width = 600,
@@ -84,8 +85,8 @@ var scatterInit = function(){
         currentY = "Students Per Teacher";
         currentX = "Poverty Rate";
       
-        tempXValue = function(d) { return parseFloat(d.PovertyRate);}
-        tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
+        var tempXValue = function(d) { return parseFloat(d.PovertyRate);}
+        var tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
      
         reDraw(tempData, tempYValue, tempXValue);
     });
@@ -96,8 +97,8 @@ var scatterInit = function(){
         currentY = "Higher Education Rate";
         currentX = "Unemployment Rate";
       
-        tempYValue = function(d) {  return parseFloat(d.HigherEducationRate);}
-        tempXValue = function(d) { return parseFloat(d.UnemploymentRate);}
+        var tempYValue = function(d) {  return parseFloat(d.HigherEducationRate);}
+        var tempXValue = function(d) { return parseFloat(d.UnemploymentRate);}
        
         reDraw(tempData, tempYValue, tempXValue);
     });
@@ -108,8 +109,8 @@ var scatterInit = function(){
         currentY = "Highschool Grad Rate";
         currentX = "Poverty Rate";
       
-        tempXValue = function(d) { return parseFloat(d.PovertyRate);}
-        tempYValue = function(d) {  return parseFloat(d.HighSchoolGradRate);}
+        var tempXValue = function(d) { return parseFloat(d.PovertyRate);}
+        var tempYValue = function(d) {  return parseFloat(d.HighSchoolGradRate);}
      
         reDraw(tempData, tempYValue, tempXValue);
     });
@@ -167,7 +168,8 @@ var visualize = function (error, data) {
         .attr('height', 220)
         .attr('width', 350)
         .attr('fill', '#F0F0F0')
-        .attr('stroke', '#000');
+        .attr('stroke', '#F00')
+        .attr("stroke-width", 2);
     watchTooltip.append('text')
         .attr('text-anchor', 'middle')
         .attr('x', 195)
@@ -233,12 +235,16 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
         .data(data)
         .enter()      
         .append("circle")
+        .attr('id', function(d) {
+            return `scatter__${d.Abbr}`
+        })
         .attr("class", "dot")
-        .attr("r", 15)
+        .attr("r", 10)
         .attr("cx", xMap)
         .attr("cy", yMap)
         .attr("fill", "rgba(155, 155, 155, 1)")
         .attr("stroke", "rgba(0, 0, 0, 1)")
+        .attr("stroke-width", 2)
         .on("mouseover", updateHoverWatch)
         .on("mouseout", clearHover)
         .on("click", updateWatchTooltip);
@@ -326,6 +332,7 @@ var reDraw = function(data, yValue, xValue) {
 };
 
 var watchTooltip;
+var prevWatchDot;
 var watchFirstCall = true;
 
 var updateWatchTooltip = function(d) {
@@ -334,6 +341,20 @@ var updateWatchTooltip = function(d) {
     var keys = Object.keys(d).filter( function(key) {
         return key !== 'Abbr' && key !== 'UnemploymentRate';
     });
+
+    if (prevWatchDot) {
+        svg.select(`#scatter__${prevWatchDot.Abbr}`)
+        .transition()
+        .duration(400)
+        .attr('stroke', '#000');
+    }
+
+    svg.select(`#scatter__${d.Abbr}`)
+        .transition()
+        .duration(400)
+        .attr('stroke', '#F00');
+
+    prevWatchDot = d;
 
     // add data if its the first call otherwise change the values with merge
     if (watchFirstCall) {
