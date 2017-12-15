@@ -29,9 +29,8 @@ var tooltip = d3.select("div.svg__container").append("div")
 
 // data points
 var dotGroup;
-var dotGroupText;
 var axisRoundingY = 5;
-var axisRoundingX = 1000;
+var axisRoundingX = 1;
 
 var currentX = "Spending Per Student";
 
@@ -80,7 +79,7 @@ var scatterInit = function(){
 
     presetButtonA.addEventListener('click', function(){
         axisRoundingY = 2;
-        axisRoundingx = 1;
+        axisRoundingX = 2;
 
         currentY = "Students Per Teacher";
         currentX = "Poverty Rate";
@@ -92,7 +91,7 @@ var scatterInit = function(){
     });
     presetButtonB.addEventListener('click', function(){
         axisRoundingY = 5;
-        axisRoundingx = 1;
+        axisRoundingX = 1;
 
         currentY = "Higher Education Rate";
         currentX = "Unemployment Rate";
@@ -104,7 +103,7 @@ var scatterInit = function(){
     });
     presetButtonC.addEventListener('click', function(){
         axisRoundingY = 2;
-        axisRoundingx = 1;
+        axisRoundingX = 2;
 
         currentY = "Highschool Grad Rate";
         currentX = "Poverty Rate";
@@ -175,6 +174,23 @@ var visualize = function (error, data) {
         .attr('y', 20)
         .text('Click Data to Watch');
 
+    hoverTooltip = svg.append('g');
+    hoverTooltip.attr('class', 'hover__tooltip')
+        .attr('transform', 'translate(-410, 0)');
+    hoverTooltip.append('rect')
+        .attr('x', 20)
+        .attr('y', 300)
+        .attr('height', 220)
+        .attr('width', 350)
+        .attr('fill', '#F0F0F0')
+        .attr('stroke', '#000');
+    hoverTooltip.append('text')
+        .attr('id', 'hover__title')
+        .attr('text-anchor', 'middle')
+        .attr('x', 195)
+        .attr('y', 320)
+        .text('Hover to View Data');
+
     initDraw(data, xMap, yMap, xAxis, yAxis, xValue, yValue);
 };
 
@@ -211,7 +227,6 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
     .attr('stroke', '#BABABA');
     
     dotGroup = svg.append('g');
-    dotGroupText = svg.append('g');
 
     // draw dots
     dotGroup.selectAll(".dot")
@@ -224,35 +239,9 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
         .attr("cy", yMap)
         .attr("fill", "rgba(155, 155, 155, 1)")
         .attr("stroke", "rgba(0, 0, 0, 1)")
-        .on("mouseover", function(d) {
-            tooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
-            tooltip.html(d.State + "<br/> (" + d.PovertyRate 
-                + ", " + yValue(d) + ")")
-                .style("left", (d3.event.pageX + 5) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
-            })
-        .on("mouseout", function(d) {
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
-        })
+        .on("mouseover", updateHoverWatch)
+        .on("mouseout", clearHover)
         .on("click", updateWatchTooltip);
-
-    dotGroupText.selectAll('text')
-        .data(data)
-        .enter()
-        .append('text')
-        .attr("x", xMap)
-        .attr("y", yMap)
-        .style("font-size", "12px")
-        .style("text-anchor", "middle")
-        .attr("alignment-baseline", "middle")
-        .style('pointer-events', 'none')
-        .text(function (d) {
-            return d.Abbr
-        });
 };
 
 var reDraw = function(data, yValue, xValue) {
@@ -334,14 +323,6 @@ var reDraw = function(data, yValue, xValue) {
         .duration(400)
         .attr("cy", yMap || 0)
         .attr("cx", xMap || 0);
-
-    dotGroupText.selectAll("text")
-        .data(data)
-        .merge(dotGroup)
-        .transition()
-        .duration(400)
-        .attr("y", yMap || 0)
-        .attr("x", xMap || 0);
 };
 
 var watchTooltip;
@@ -416,4 +397,66 @@ var updateWatchTooltip = function(d) {
     }
 };
 
+var hoverTooltip;
+
+var updateHoverWatch = function(d){
+     // get the keys in object d
+    // filter out Abbr and UnemploymentRate
+    var keys = Object.keys(d).filter( function(key) {
+        return key !== 'Abbr' && key !== 'UnemploymentRate';
+    });
+    
+    console.log(d.Abbr);
+    
+    hoverTooltip.selectAll('.hover__' + d.Abbr)
+        .data(keys)
+        .enter()
+        .append('text')
+        .attr('class', 'hover__' + d.Abbr)
+        .attr('x', 40)
+        .attr('y', function (key, i) {
+            return 345 + (i * 20);
+        })
+        .attr('style', 'opacity: 0')
+        .transition()
+        .duration(400)
+        .attr('style', 'opacity: 1')
+        .text(function (key, i) {
+        var dataValue = d[key] || 'N/A';
+
+        if (i > 4) {
+            dataValue = numberWithCommas(parseFloat(d[key]));
+        }
+
+        // add dollar symbol
+        if (i > 7) {
+            dataValue = `$${dataValue}`;
+        }
+
+        return `${addSpace(key)}: ${dataValue}`;
+        });
+
+        hoverTooltip.select('#hover__title')
+        .text('Hovering')
+        .attr('style', 'opacity: 0')
+        .transition()
+        .duration(400)
+        .attr('style', 'opacity: 1');
+}
+
+var clearHover = function(d){
+    console.log(d.Abbr);
+    hoverTooltip.selectAll('.hover__' + d.Abbr)
+        .transition()
+        .duration(400)
+        .attr('style', 'opacity: 0')
+        .remove();
+
+    hoverTooltip.select('#hover__title')
+        .text('Hover to View Data')
+        .attr('style', 'opacity: 0')
+        .transition()
+        .duration(400)
+        .attr('style', 'opacity: 1');
+}
 window.addEventListener('load', scatterInit);
