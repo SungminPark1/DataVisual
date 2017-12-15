@@ -43,12 +43,18 @@ body {
   height: 600px;
   margin-left: 6px;
   padding: 50px 0 10px 0;
+  text-align: center;
 }
 
 .control__container h2 {
   position: relative;
-  margin-top: 12px;
+  margin-top: 16px;
+  margin-bottom: 8px;
   text-align: center;
+}
+
+.margin__top {
+  margin-top: 32px !important;
 }
 
 .view_buttons {
@@ -142,6 +148,17 @@ text {
   background-color: white;
 }
 
+.axis_label {
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
 select {
+  margin: 0 auto;
   z-index: 10;
+  width: 225px;
+}
+
+#x_select {
+  background-color: #D7D7D7;
 }

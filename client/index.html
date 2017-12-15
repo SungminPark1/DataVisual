@@ -45,15 +45,20 @@
             </div>
           </div>
           <div class="compare_controls">
-            <label for="yAxis_Select">YAxis Variable</label>
+            <p class="axis_label">X Axis</p>
+            <select disabled id="x_select" name="xAxis_Select"> 
+              <option value="SelectAValue">Spending Per Student</option>
+            </select>
+            <p class="axis_label">Y Axis</p>
             <select id="y_select" name="yAxis_Select"> 
               <option value="SelectAValue">Select A Value</option>
-              <option value="HigherEducationRate">Higher Education Rate</option>
-              <option value="PovertyRate">Poverty Rate</option>
+              <option value="PovertyRate" selected="">Poverty Rate</option>
               <option value="HighSchoolGradRate">High School Graduation Rate</option>
+              <option value="HigherEducationRate">Higher Education Rate</option>
               <option value="UnemploymentRate">Unemployment Rate Rate</option>
               <option value="studentsPerTeacher">Students Per Teacher</option>
             </select>
+            <h2 class="margin__top">Presets</h2>
             <div class="button" id="scatter_preset_a" >
               <p class="button__text">Preset A</p>
             </div>

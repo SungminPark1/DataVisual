@@ -1,11 +1,11 @@
 /* eslint-disable */
 'use strict';
 
-var padding = "25px 20px 45px 430px",
+var padding = "25px 30px 45px 420px",
 width = 600,
 height = 600;
 
-var currentY = "Higher Education Rate";
+var currentY = "Poverty Rate";
 var yDropDown = document.querySelector("#y_select");
 
 var tempData;
@@ -30,7 +30,7 @@ var tooltip = d3.select("div.svg__container").append("div")
 
 // data points
 var dotGroup;
-var axisRoundingY = 5;
+var axisRoundingY = 2;
 var axisRoundingX = 2000;
 
 var currentX = "Spending Per Student";
@@ -43,40 +43,41 @@ var presetButtonC = document.querySelector("#scatter_preset_c")
 
 var scatterInit = function(){
     yDropDown.addEventListener("change", function() {
+        // unselected button style
+        presetButtonA.className = 'button ';
+        presetButtonB.className = 'button ';
+        presetButtonC.className = 'button ';
+
         // set x rounding
         axisRoundingX = 2000;
         var tempYValue;
         var xValue = function(d) {
             return d.ExpendPerStudent;
        };
-       currentX="Spending per student";
+       // lock x axis value
+       currentX = "Spending per student";
 
-        if (yDropDown.value == "HigherEducationRate" ){
-            axisRoundingY = 5;
-            currentY="Higher Education Rate";
-            tempYValue = function(d) { return parseFloat(d.HigherEducationRate);}
-        }
-        else if(yDropDown.value == "PovertyRate"){
+        if(yDropDown.value == "PovertyRate") {
             axisRoundingY = 2;
             currentY = "Poverty Rate";
             tempYValue = function(d) { return parseFloat(d.PovertyRate);}
-        }
-        else if (yDropDown.value == "HighSchoolGradRate"){
+        } else if (yDropDown.value == "HighSchoolGradRate") {
             axisRoundingY = 5;
             currentY = "High School Graduation Rate";
             tempYValue = function(d) { return (parseFloat(d.HighSchoolGradRate));}
-        }
-        else if (yDropDown.value == "UnemploymentRate"){
+        } else if (yDropDown.value == "HigherEducationRate" ) {
+            axisRoundingY = 5;
+            currentY="Higher Education Rate";
+            tempYValue = function(d) { return parseFloat(d.HigherEducationRate);}
+        } else if (yDropDown.value == "UnemploymentRate") {
             axisRoundingY = 1;
             currentY = "Unemployment Rate";
             tempYValue = function(d) { return (parseFloat(d.UnemploymentRate));}
-        }
-        else if (yDropDown.value == "studentsPerTeacher"){
+        } else if (yDropDown.value == "studentsPerTeacher") {
             axisRoundingY = 2;
             currentY = "Students Per Teacher";
             tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
-        }
-        else{
+        } else {
             return;
         }
         
@@ -88,6 +89,10 @@ var scatterInit = function(){
         axisRoundingY = 2;
         axisRoundingX = 2;
 
+        presetButtonA.className = 'button button__selected';
+        presetButtonB.className = 'button ';
+        presetButtonC.className = 'button ';
+
         currentY = "Students Per Teacher";
         currentX = "Poverty Rate";
       
@@ -98,27 +103,36 @@ var scatterInit = function(){
     });
     presetButtonB.addEventListener('click', function(){
         yDropDown.selectedIndex = 0;
-        axisRoundingY = 5;
-        axisRoundingX = 1;
-
-        currentY = "Higher Education Rate";
-        currentX = "Unemployment Rate";
-      
-        var tempYValue = function(d) {  return parseFloat(d.HigherEducationRate);}
-        var tempXValue = function(d) { return parseFloat(d.UnemploymentRate);}
-       
-        reDraw(tempData, tempYValue, tempXValue);
-    });
-    presetButtonC.addEventListener('click', function(){
-        yDropDown.selectedIndex = 0;
         axisRoundingY = 2;
         axisRoundingX = 2;
+
+        presetButtonA.className = 'button ';
+        presetButtonB.className = 'button button__selected';
+        presetButtonC.className = 'button ';
+
 
         currentY = "Highschool Grad Rate";
         currentX = "Poverty Rate";
       
         var tempXValue = function(d) { return parseFloat(d.PovertyRate);}
         var tempYValue = function(d) {  return parseFloat(d.HighSchoolGradRate);}
+       
+        reDraw(tempData, tempYValue, tempXValue);
+    });
+    presetButtonC.addEventListener('click', function(){
+        yDropDown.selectedIndex = 0;
+        axisRoundingY = 5;
+        axisRoundingX = 1;
+
+        presetButtonA.className = 'button ';
+        presetButtonB.className = 'button ';
+        presetButtonC.className = 'button button__selected';
+
+        currentY = "Higher Education Rate";
+        currentX = "Unemployment Rate";
+      
+        var tempYValue = function(d) {  return parseFloat(d.HigherEducationRate);}
+        var tempXValue = function(d) { return parseFloat(d.UnemploymentRate);}
      
         reDraw(tempData, tempYValue, tempXValue);
     });
@@ -131,6 +145,7 @@ var scatterInit = function(){
 var visualize = function (error, data) {
     tempData = data;
 
+    // add expendture per student
     for (var i = 0; i < data.length; i++) {
       var d = data[i];
 
@@ -154,7 +169,7 @@ var visualize = function (error, data) {
         .tickSize(-height);
 
     // Setup init y values
-    var yValue = function(d) { return parseFloat(d.HigherEducationRate)};
+    var yValue = function(d) { return parseFloat(d.PovertyRate)};
     var yScale = d3.scaleLinear().range([height, 0]);
     yScale.domain([
         Math.floor((d3.min(data, yValue)-1) / axisRoundingY) * axisRoundingY,
@@ -174,13 +189,13 @@ var visualize = function (error, data) {
         .attr('x', 20)
         .attr('y', 0)
         .attr('height', 240)
-        .attr('width', 350)
+        .attr('width', 300)
         .attr('fill', '#F0F0F0')
         .attr('stroke', '#000')
         .attr("stroke-width", 2);
     watchTooltip.append('text')
         .attr('text-anchor', 'middle')
-        .attr('x', 195)
+        .attr('x', 175)
         .attr('y', 20)
         .text('Click Data to Watch');
 
@@ -191,14 +206,14 @@ var visualize = function (error, data) {
         .attr('x', 20)
         .attr('y', 300)
         .attr('height', 240)
-        .attr('width', 350)
+        .attr('width', 300)
         .attr('fill', '#F0F0F0')
         .attr('stroke', '#000')
         .attr("stroke-width", 2);
-        hoverTooltip.append('text')
+    hoverTooltip.append('text')
         .attr('id', 'hover__title')
         .attr('text-anchor', 'middle')
-        .attr('x', 195)
+        .attr('x', 175)
         .attr('y', 320)
         .text('Hover to View Data');
 
@@ -213,14 +228,16 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
         .call(xAxis)
         .selectAll('.tick:not(:first-of-type) line')
         .attr('stroke', '#BABABA');
-        horizontalGrid.append("text")
+    horizontalGrid.selectAll('.tick text')
+        .style('font-size', '12px')
+        .attr('transform', 'translate(0, 5)');
+    horizontalGrid.append("text")
         .attr("class", "label")
         .attr("x", width)
-       // .attr("dx", "1.71em")
         .attr("y", -6)
         .style("text-anchor", "end")
+        .style("font-size", "12px")
         .text(currentX);
-    
     
     // y-axis
     verticalGrid = svg.append("g");
@@ -228,17 +245,18 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
         .call(yAxis)
         .selectAll('.tick:not(:first-of-type) line')
         .attr('stroke', '#BABABA');
-        verticalGrid.append("text")
+    verticalGrid.selectAll('.tick text')
+        .style('font-size', '12px')
+        .attr('transform', 'translate(-5, 0)');
+    verticalGrid.append("text")
         .attr("class", "label")
-        .attr("transform", "translate(20, 300)")        
-        //.attr("transform", "rotate(-90)")
+        .attr("transform", "translate(20, 20)")        
         .attr("y", 6)
-        .attr("dy", "1.71em")
-        //.style("text-anchor", "Start")
-        .attr("alignment-baseline", "hanging")
+        .attr("text-anchor", "start")
         .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
+        .style("font-size", "12px")
         .text(currentY || 'var name')
-    
+
     dotGroup = svg.append('g')
       .attr('class', 'dotGroup')
       .selectAll('.circle') //any value seems to work but THIS is needed for it to grab correct circle
@@ -252,7 +270,7 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
             return `scatter__${d.Abbr}`
         })
         .attr("class", "dot")
-        .attr("r", 12)
+        .attr("r", 15)
         .attr("cx", xMap)
         .attr("cy", yMap)
         .attr("fill", "rgba(155, 155, 155, 1)")
@@ -264,13 +282,13 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
 
     dotGroup.append('text')
         .attr("class", "scatter__lable")
-            .attr("x", xMap)
-            .attr("y", yMap)
-            .attr("alignment-baseline", "middle")
-            .style("text-anchor", "middle")
-            .style("pointer-events", "none")
-            .style("font-size", "12px")
-            .text(function(d) { return d.Abbr; });
+        .attr("x", xMap)
+        .attr("y", yMap)
+        .attr("alignment-baseline", "middle")
+        .attr("text-anchor", "middle")
+        .style("pointer-events", "none")
+        .style("font-size", "12px")
+        .text(function(d) { return d.Abbr; });
 };
 
 var reDraw = function(data, yValue, xValue) {
@@ -310,11 +328,15 @@ var reDraw = function(data, yValue, xValue) {
         .transition()
         .duration(400)
         .attr('opacity', 1);
+    horizontalGrid.selectAll('.tick text')
+        .style('font-size', '12px')
+        .attr('transform', 'translate(0, 5)');
     horizontalGrid.append("text")
         .attr("class", "label")
         .attr("x", width)
         .attr("y", -6)
         .style("text-anchor", "end")
+        .style("font-size", "12px")
         .text(currentX)
         .attr('opacity', 0)
         .transition()
@@ -323,10 +345,6 @@ var reDraw = function(data, yValue, xValue) {
 
     // y-axis
     verticalGrid.selectAll('*').remove();
-    verticalGrid.attr('opacity', 0)
-        .transition()
-        .duration(400)
-        .attr('opacity', 1);
     verticalGrid.call(yAxis)
         .selectAll('.tick:not(:first-of-type) line')
         .attr('stroke', '#BABABA')
@@ -334,15 +352,16 @@ var reDraw = function(data, yValue, xValue) {
         .transition()
         .duration(400)
         .attr('opacity', 1);
+    verticalGrid.selectAll('.tick text')
+        .style('font-size', '12px')
+        .attr('transform', 'translate(-5, 0)');
     verticalGrid.append("text")
         .attr("class", "label")
-        .attr("transform", "translate(20, 300)")        
-        //.attr("transform", "rotate(-90)")
+        .attr("transform", "translate(20, 20)")        
         .attr("y", 6)
-        .attr("dy", ".71em")
-        //.style("text-anchor", "Start")
-        .attr("alignment-baseline", "hanging")
+        .attr("text-anchor", "start")
         .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
+        .style("font-size", "12px")
         .text(currentY)
         .attr('opacity', 0)
         .transition()
@@ -423,7 +442,7 @@ var updateWatchTooltip = function(d) {
 
         watchTooltip.append('text')
             .attr('text-anchor', 'middle')
-            .attr('x', 195)
+            .attr('x', 175)
             .attr('y', 20)
             .text('Watching')
             .attr('style', 'opacity: 0')
