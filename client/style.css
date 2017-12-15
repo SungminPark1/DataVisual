@@ -145,11 +145,3 @@ text {
 select {
   z-index: 10;
 }
-
-.x__axis .tick{
-  opacity: 0.5;
-}
-
-.y__axis .tick{
-  opacity: 0.5;
-}

@@ -74,11 +74,15 @@ var scatterInit = function(){
             currentY = "Students Per Teacher";
             tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
         }
+        else{
+            return;
+        }
         
         reDraw(tempData, tempYValue, xValue);
     });
 
     presetButtonA.addEventListener('click', function(){
+        yDropDown.selectedIndex = 0;
         axisRoundingY = 2;
         axisRoundingX = 2;
 
@@ -91,6 +95,7 @@ var scatterInit = function(){
         reDraw(tempData, tempYValue, tempXValue);
     });
     presetButtonB.addEventListener('click', function(){
+        yDropDown.selectedIndex = 0;
         axisRoundingY = 5;
         axisRoundingX = 1;
 
@@ -103,6 +108,7 @@ var scatterInit = function(){
         reDraw(tempData, tempYValue, tempXValue);
     });
     presetButtonC.addEventListener('click', function(){
+        yDropDown.selectedIndex = 0;
         axisRoundingY = 2;
         axisRoundingX = 2;
 
@@ -168,7 +174,7 @@ var visualize = function (error, data) {
         .attr('height', 220)
         .attr('width', 350)
         .attr('fill', '#F0F0F0')
-        .attr('stroke', '#F00')
+        .attr('stroke', '#000')
         .attr("stroke-width", 2);
     watchTooltip.append('text')
         .attr('text-anchor', 'middle')
@@ -185,8 +191,9 @@ var visualize = function (error, data) {
         .attr('height', 220)
         .attr('width', 350)
         .attr('fill', '#F0F0F0')
-        .attr('stroke', '#000');
-    hoverTooltip.append('text')
+        .attr('stroke', '#000')
+        .attr("stroke-width", 2);
+        hoverTooltip.append('text')
         .attr('id', 'hover__title')
         .attr('text-anchor', 'middle')
         .attr('x', 195)
@@ -198,35 +205,37 @@ var visualize = function (error, data) {
 
 var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
     // x-axis
-    horizontalGrid = svg.append("g");
+    horizontalGrid = svg.append("g")
     horizontalGrid.attr("class", "x__axis")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis)
-    .append("text")
+    .selectAll('.tick:not(:first-of-type) line')
+    .attr('stroke', '#BABABA');
+    horizontalGrid.append("text")
     .attr("class", "label")
     .attr("x", width)
+   // .attr("dx", "1.71em")
     .attr("y", -6)
     .style("text-anchor", "end")
     .text(currentX)
-    .selectAll('.tick:not(:first-of-type) line')
-    .attr('stroke', '#BABABA');
+    
     
     // y-axis
-    verticalGrid = svg.append("g");
+    verticalGrid = svg.append("g")
     verticalGrid.attr("class", "y__axis")
     .call(yAxis)
-    .append("text")
+    .selectAll('.tick:not(:first-of-type) line')
+    .attr('stroke', '#BABABA');
+    verticalGrid.append("text")
     .attr("class", "label")
     .attr("transform", "translate(20, 300)")        
     //.attr("transform", "rotate(-90)")
     .attr("y", 6)
-    .attr("dy", ".71em")
+    .attr("dy", "1.71em")
     //.style("text-anchor", "Start")
     .attr("alignment-baseline", "hanging")
     .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
     .text(currentY || 'var name')
-    .selectAll('.tick:not(:first-of-type) line')
-    .attr('stroke', '#BABABA');
     
     dotGroup = svg.append('g');
 
@@ -283,16 +292,20 @@ var reDraw = function(data, yValue, xValue) {
     horizontalGrid.attr('opacity', 0)
         .transition()
         .duration(400)
+        .attr('opacity', 1)
+        .selectAll('.tick:not(:first-of-type) line')
+        .attr('stroke', '#BABABA')
+        .attr('opacity', 0)
+        .transition()
+        .duration(400)
         .attr('opacity', 1);
     horizontalGrid.call(xAxis)
-        .append("text")
+    horizontalGrid.append("text")
         .attr("class", "label")
         .attr("x", width)
         .attr("y", -6)
         .style("text-anchor", "end")
         .text(currentX)
-        .selectAll('.tick:not(:first-of-type) line')
-        .attr('stroke', '#BABABA')
         .attr('opacity', 0)
         .transition()
         .duration(400)
@@ -305,7 +318,13 @@ var reDraw = function(data, yValue, xValue) {
         .duration(400)
         .attr('opacity', 1);
     verticalGrid.call(yAxis)
-        .append("text")
+        .selectAll('.tick:not(:first-of-type) line')
+        .attr('stroke', '#BABABA')
+        .attr('opacity', 0)
+        .transition()
+        .duration(400)
+        .attr('opacity', 1);
+    verticalGrid.append("text")
         .attr("class", "label")
         .attr("transform", "translate(20, 300)")        
         //.attr("transform", "rotate(-90)")
@@ -315,8 +334,6 @@ var reDraw = function(data, yValue, xValue) {
         .attr("alignment-baseline", "hanging")
         .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
         .text(currentY)
-        .selectAll('.tick:not(:first-of-type) line')
-        .attr('stroke', '#BABABA')
         .attr('opacity', 0)
         .transition()
         .duration(400)
@@ -345,13 +362,13 @@ var updateWatchTooltip = function(d) {
     if (prevWatchDot) {
         svg.select(`#scatter__${prevWatchDot.Abbr}`)
         .transition()
-        .duration(400)
+        .duration(200)
         .attr('stroke', '#000');
     }
 
     svg.select(`#scatter__${d.Abbr}`)
         .transition()
-        .duration(400)
+        .duration(200)
         .attr('stroke', '#F00');
 
     prevWatchDot = d;
@@ -397,6 +414,11 @@ var updateWatchTooltip = function(d) {
             .transition()
             .duration(400)
             .attr('style', 'opacity: 1');
+
+            watchTooltip.select('rect')
+            .transition()
+            .duration(400)
+            .attr('stroke', '#f00');
     } else {
         watchTooltip.selectAll('text')
             .data(keys)
@@ -463,6 +485,11 @@ var updateHoverWatch = function(d){
         .transition()
         .duration(400)
         .attr('style', 'opacity: 1');
+
+        svg.select("#scatter__" + d.Abbr)
+        .transition()
+        .duration(400)
+        .attr("fill", "rgb(200, 200, 200)")
 }
 
 var clearHover = function(d){
@@ -479,5 +506,10 @@ var clearHover = function(d){
         .transition()
         .duration(400)
         .attr('style', 'opacity: 1');
+
+        svg.select("#scatter__" + d.Abbr)
+        .transition()
+        .duration(400)
+        .attr("fill", "rgb(155, 155, 155)")
 }
 window.addEventListener('load', scatterInit);
