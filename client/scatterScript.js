@@ -1,4 +1,5 @@
 /* eslint-disable */
+'use strict';
 
 var padding = "25px 20px 45px 430px",
 width = 600,
@@ -29,9 +30,8 @@ var tooltip = d3.select("div.svg__container").append("div")
 
 // data points
 var dotGroup;
-var dotGroupText;
 var axisRoundingY = 5;
-var axisRoundingX = 1000;
+var axisRoundingX = 1;
 
 var currentX = "Spending Per Student";
 
@@ -80,37 +80,37 @@ var scatterInit = function(){
 
     presetButtonA.addEventListener('click', function(){
         axisRoundingY = 2;
-        axisRoundingx = 1;
+        axisRoundingX = 1;
 
         currentY = "Students Per Teacher";
         currentX = "Poverty Rate";
       
-        tempXValue = function(d) { return parseFloat(d.PovertyRate);}
-        tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
+        var tempXValue = function(d) { return parseFloat(d.PovertyRate);}
+        var tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
      
         reDraw(tempData, tempYValue, tempXValue);
     });
     presetButtonB.addEventListener('click', function(){
         axisRoundingY = 5;
-        axisRoundingx = 1;
+        axisRoundingX = 1;
 
         currentY = "Higher Education Rate";
         currentX = "Unemployment Rate";
       
-        tempYValue = function(d) {  return parseFloat(d.HigherEducationRate);}
-        tempXValue = function(d) { return parseFloat(d.UnemploymentRate);}
+        var tempYValue = function(d) {  return parseFloat(d.HigherEducationRate);}
+        var tempXValue = function(d) { return parseFloat(d.UnemploymentRate);}
        
         reDraw(tempData, tempYValue, tempXValue);
     });
     presetButtonC.addEventListener('click', function(){
         axisRoundingY = 2;
-        axisRoundingx = 1;
+        axisRoundingX = 1;
 
         currentY = "Highschool Grad Rate";
         currentX = "Poverty Rate";
       
-        tempXValue = function(d) { return parseFloat(d.PovertyRate);}
-        tempYValue = function(d) {  return parseFloat(d.HighSchoolGradRate);}
+        var tempXValue = function(d) { return parseFloat(d.PovertyRate);}
+        var tempYValue = function(d) {  return parseFloat(d.HighSchoolGradRate);}
      
         reDraw(tempData, tempYValue, tempXValue);
     });
@@ -168,7 +168,8 @@ var visualize = function (error, data) {
         .attr('height', 220)
         .attr('width', 350)
         .attr('fill', '#F0F0F0')
-        .attr('stroke', '#000');
+        .attr('stroke', '#F00')
+        .attr("stroke-width", 2);
     watchTooltip.append('text')
         .attr('text-anchor', 'middle')
         .attr('x', 195)
@@ -211,48 +212,37 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
     .attr('stroke', '#BABABA');
     
     dotGroup = svg.append('g');
-    dotGroupText = svg.append('g');
 
     // draw dots
     dotGroup.selectAll(".dot")
         .data(data)
         .enter()      
         .append("circle")
-        .attr("class", "dot")
-        .attr("r", 15)
-        .attr("cx", xMap)
-        .attr("cy", yMap)
-        .attr("fill", "rgba(155, 155, 155, 1)")
-        .attr("stroke", "rgba(0, 0, 0, 1)")
-        .on("mouseover", function(d) {
-            tooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
-            tooltip.html(d.State + "<br/> (" + d.PovertyRate 
-                + ", " + yValue(d) + ")")
-                .style("left", (d3.event.pageX + 5) + "px")
-                .style("top", (d3.event.pageY - 28) + "px");
+            .attr('id', function(d) {
+                return `scatter__${d.Abbr}`}
+            )
+            .attr("class", "dot")
+            .attr("r", 10)
+            .attr("cx", xMap)
+            .attr("cy", yMap)
+            .attr("fill", "rgba(155, 155, 155, 1)")
+            .attr("stroke", "rgba(0, 0, 0, 1)")
+            .attr("stroke-width", 2)
+            .on("mouseover", function(d) {
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                tooltip.html(d.State + "<br/> (" + d.PovertyRate 
+                    + ", " + yValue(d) + ")")
+                    .style("left", (d3.event.pageX + 5) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+                })
+            .on("mouseout", function(d) {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
             })
-        .on("mouseout", function(d) {
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
-        })
-        .on("click", updateWatchTooltip);
-
-    dotGroupText.selectAll('text')
-        .data(data)
-        .enter()
-        .append('text')
-        .attr("x", xMap)
-        .attr("y", yMap)
-        .style("font-size", "12px")
-        .style("text-anchor", "middle")
-        .attr("alignment-baseline", "middle")
-        .style('pointer-events', 'none')
-        .text(function (d) {
-            return d.Abbr
-        });
+            .on("click", updateWatchTooltip);
 };
 
 var reDraw = function(data, yValue, xValue) {
@@ -334,17 +324,10 @@ var reDraw = function(data, yValue, xValue) {
         .duration(400)
         .attr("cy", yMap || 0)
         .attr("cx", xMap || 0);
-
-    dotGroupText.selectAll("text")
-        .data(data)
-        .merge(dotGroup)
-        .transition()
-        .duration(400)
-        .attr("y", yMap || 0)
-        .attr("x", xMap || 0);
 };
 
 var watchTooltip;
+var prevWatchDot;
 var watchFirstCall = true;
 
 var updateWatchTooltip = function(d) {
@@ -353,6 +336,20 @@ var updateWatchTooltip = function(d) {
     var keys = Object.keys(d).filter( function(key) {
         return key !== 'Abbr' && key !== 'UnemploymentRate';
     });
+
+    if (prevWatchDot) {
+        svg.select(`#scatter__${prevWatchDot.Abbr}`)
+        .transition()
+        .duration(400)
+        .attr('stroke', '#000');
+    }
+
+    svg.select(`#scatter__${d.Abbr}`)
+        .transition()
+        .duration(400)
+        .attr('stroke', '#F00');
+
+    prevWatchDot = d;
 
     // add data if its the first call otherwise change the values with merge
     if (watchFirstCall) {
