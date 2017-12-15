@@ -11,7 +11,7 @@
 
   <body>
     <div class="wrapper">
-      <h1>US Poverty and Education Map</h1>
+      <h1>Poverty's Impact on Education</h1>
       <div class="visual__container">
         <div class="svg__container">
           <div class="svg__map"></div>
@@ -55,27 +55,36 @@
               <option value="PovertyRate" selected="">Poverty Rate</option>
               <option value="HighSchoolGradRate">High School Graduation Rate</option>
               <option value="HigherEducationRate">Higher Education Rate</option>
-              <option value="UnemploymentRate">Unemployment Rate Rate</option>
               <option value="studentsPerTeacher">Students Per Teacher</option>
             </select>
-            <h2 class="margin__top">Presets</h2>
+            <h2 class="margin__top">Preset Views</h2>
             <div class="button" id="scatter_preset_a" >
-              <p class="button__text">Preset A</p>
+              <p class="button__text">Poverty / Students Per Teacher </p>
             </div>
             <div class="button" id="scatter_preset_b" >
-              <p class="button__text">Preset B</p>
+              <p class="button__text">Poverty / High School Graduate</p>
             </div>
             <div class="button" id="scatter_preset_c" >
-              <p class="button__text">Preset C</p>
+              <p class="button__text">Higher Edu. / Unemployment</p>
             </div>
           </div>
         </div>
       </div>
       <div class="text__container">
-        <h3>Info</h3>
+        <h3>The Data</h3>
         <p>
-          Data from The Center of American Progress and The National Center for Education Statistics. Map geometry data from d3's us json. US Map overview code is in ES6 (may not work in some browsers).
+          We found two different datasets, one of these being a collection of education statistics in the United States; at the state level, and the other being detailed information on poverty rates within the united states; also at the state level.  The education data was taken from the NCES website, while a study and scholarly article provided by Rachel West and Jackie Odum (State of States Report 2015) provided the poverty data.
         </p>
+          <h3>The Take Away</h3>
+        <p>
+            When we dove into the data we quickly noticed some rather startling correlations between these two sets of data.  First and foremost this underscores the unfornature correlation between poverty rates and spending per students.
+        </p>
+
+         <p style="float: right;">
+             By: Sungmin Park, Logan Rogers
+         </p>
+          <p style="clear: both;">
+          </p>
       </div>
     </div>
   </body>

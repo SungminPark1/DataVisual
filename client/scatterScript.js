@@ -69,10 +69,6 @@ var scatterInit = function(){
             axisRoundingY = 5;
             currentY="Higher Education Rate";
             tempYValue = function(d) { return parseFloat(d.HigherEducationRate);}
-        } else if (yDropDown.value == "UnemploymentRate") {
-            axisRoundingY = 1;
-            currentY = "Unemployment Rate";
-            tempYValue = function(d) { return (parseFloat(d.UnemploymentRate));}
         } else if (yDropDown.value == "studentsPerTeacher") {
             axisRoundingY = 2;
             currentY = "Students Per Teacher";
@@ -188,7 +184,7 @@ var visualize = function (error, data) {
     watchTooltip.append('rect')
         .attr('x', 20)
         .attr('y', 0)
-        .attr('height', 240)
+        .attr('height', 260)
         .attr('width', 300)
         .attr('fill', '#F0F0F0')
         .attr('stroke', '#000')
@@ -205,7 +201,7 @@ var visualize = function (error, data) {
     hoverTooltip.append('rect')
         .attr('x', 20)
         .attr('y', 300)
-        .attr('height', 240)
+        .attr('height', 260)
         .attr('width', 300)
         .attr('fill', '#F0F0F0')
         .attr('stroke', '#000')
@@ -259,7 +255,7 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
 
     dotGroup = svg.append('g')
       .attr('class', 'dotGroup')
-      .selectAll('.circle') //any value seems to work but THIS is needed for it to grab correct circle
+      .selectAll('.dot') //any value seems to work but THIS is needed for it to grab correct circle
       .data(data)
       .enter()
       .append('g');
@@ -273,7 +269,7 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
         .attr("r", 15)
         .attr("cx", xMap)
         .attr("cy", yMap)
-        .attr("fill", "rgba(155, 155, 155, 1)")
+        .attr("fill", "rgba(190, 190, 190, 1)")
         .attr("stroke", "rgba(0, 0, 0, 1)")
         .attr("stroke-width", 2)
         .on("mouseover", updateHoverWatch)
@@ -368,17 +364,26 @@ var reDraw = function(data, yValue, xValue) {
         .duration(400)
         .attr('opacity', 1);
 
+    var dotCounter = 0;
+    var labelCounter = 0;
     dotGroup.selectAll(".dot")
-        .merge(dotGroup)
         .transition()
         .duration(400)
+        .delay(function (d, i) {
+            dotCounter++;
+            return dotCounter * 10;
+        })
         .attr("cy", yMap || 0)
         .attr("cx", xMap || 0);
 
+
     dotGroup.selectAll(".scatter__lable")
-        .merge(dotGroup)
         .transition()
         .duration(400)
+        .delay(function (d, i) {
+            labelCounter++;
+            return labelCounter * 10;
+        })
         .attr("y", yMap || 0)
         .attr("x", xMap || 0);
 };
@@ -391,7 +396,7 @@ var updateWatchTooltip = function(d) {
     // get the keys in object d
     // filter out Abbr and UnemploymentRate
     var keys = Object.keys(d).filter( function(key) {
-        return key !== 'Abbr' && key !== 'UnemploymentRate';
+        return key !== 'Abbr';
     });
 
     if (prevWatchDot) {
@@ -428,12 +433,12 @@ var updateWatchTooltip = function(d) {
             .text(function (key, i) {
               var dataValue = d[key] || 'N/A';
 
-              if (i > 4) {
+              if (i > 5) {
                 dataValue = numberWithCommas(parseFloat(d[key]));
               }
 
               // add dollar symbol
-              if (i > 7) {
+              if (i > 8) {
                 dataValue = `$${dataValue}`;
               }
 
@@ -461,12 +466,12 @@ var updateWatchTooltip = function(d) {
             .text(function (key, i) {
               var dataValue = d[key] || 'N/A';
 
-              if (i > 4) {
+              if (i > 5) {
                 dataValue = numberWithCommas(parseFloat(d[key]));
               }
 
               // add dollar symbol
-              if (i > 7) {
+              if (i > 8) {
                 dataValue = `$${dataValue}`;
               }
 
@@ -481,7 +486,7 @@ var updateHoverWatch = function(d) {
     // get the keys in object d
     // filter out Abbr and UnemploymentRate
     var keys = Object.keys(d).filter( function(key) {
-        return key !== 'Abbr' && key !== 'UnemploymentRate';
+        return key !== 'Abbr';
     });
     
     hoverTooltip.selectAll('.hover__' + d.Abbr)
@@ -500,12 +505,12 @@ var updateHoverWatch = function(d) {
         .text(function (key, i) {
         var dataValue = d[key] || 'N/A';
 
-        if (i > 4) {
+        if (i > 5) {
             dataValue = numberWithCommas(parseFloat(d[key]));
         }
 
         // add dollar symbol
-        if (i > 7) {
+        if (i > 8) {
             dataValue = `$${dataValue}`;
         }
 
@@ -522,7 +527,7 @@ var updateHoverWatch = function(d) {
         svg.select("#scatter__" + d.Abbr)
         .transition()
         .duration(400)
-        .attr("fill", "rgb(200, 200, 200)")
+        .attr("fill", "rgb(220, 220, 220)")
 }
 
 var clearHover = function(d) {
@@ -542,6 +547,6 @@ var clearHover = function(d) {
         svg.select("#scatter__" + d.Abbr)
         .transition()
         .duration(400)
-        .attr("fill", "rgb(155, 155, 155)")
+        .attr("fill", "rgb(190, 190, 190)")
 }
 window.addEventListener('load', scatterInit);
