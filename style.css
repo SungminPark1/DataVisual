@@ -1,0 +1,147 @@
+body {
+  background-color: #D7D7D7;
+}
+
+.wrapper h1 {
+  text-align: center;
+}
+
+.visual__container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.svg__container {
+  position: relative;
+  padding: 30px 30px 30px 60px;
+  margin-bottom: 20px;
+  width: 960px;
+  height: 600px;
+  display: inline-block;
+  background-color: white;
+}
+
+.svg__scatter {
+  opacity: 0;
+  z-index: -1;
+}
+
+.svg__map, .svg__scatter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: opacity 400ms ease-in;
+}
+
+.control__container {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  background-color: white;
+  width: 250px;
+  height: 600px;
+  margin-left: 6px;
+  padding: 50px 0 10px 0;
+}
+
+.control__container h2 {
+  position: relative;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.view_buttons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 250px;
+}
+
+#overviewBtn, #compareBtn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 123px;
+  height: 50px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid black;
+  text-align: center;
+}
+
+#compareBtn {
+  left: 50%;
+}
+
+.button {
+  position: relative;
+  margin: 12px 0;
+  width: 225px;
+  height: 60px;
+  border: 1px solid black;
+  text-align: center;
+  background-color: rgb(255, 255, 255);
+}
+
+.button__selected {
+  background-color: rgb(200, 200, 200);
+}
+
+.button__text {
+  position: absolute;
+  margin: 0;
+  width: 100%;
+  top: 50%;
+  left: 0;
+  transform: translate(0, -50%);
+  text-align: center;
+}
+
+.compare_controls {
+  opacity: 0;
+  z-index: 0;
+}
+
+.overview__controls, .compare_controls {
+  position: absolute;
+  margin-left: 12px;
+  transition: opacity 400ms ease-in;
+}
+
+.states {
+  fill: rgba(255, 255, 255, 1);
+  stroke: none;
+}
+
+.state {
+  transition: opacity 400ms ease;
+  opacity: 1;
+}
+
+.state:hover {
+  opacity: 0.75;
+}
+
+.state-borders {
+  fill: none;
+  stroke: white;
+}
+
+text {
+  fill: black;
+  stroke: black;
+}
+
+.text__container {
+  margin: 0 auto;
+  padding: 6px;
+  padding-left: 20px;
+  padding-right: 80px;
+  width: 900px;
+  background-color: white;
+}
+
+select {
+  z-index: 10;
+}

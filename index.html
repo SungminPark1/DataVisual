@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Project 3</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/assets/style.css">
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <h1>US Poverty and Education Map</h1>
+      <div class="visual__container">
+        <div class="svg__container">
+          <div class="svg__map"></div>
+          <div class="svg__scatter"></div>
+        </div>
+        <div class="control__container">
+            <div class="view_buttons">
+              <div id="overviewBtn">
+                <p class="button__text">Overview</p>
+              </div>
+              <div id="compareBtn">
+                <p class="button__text">Compare<p>
+                </div>
+            </div>
+          <h2>Control</h2>
+          <div class="overview__controls">
+            <div class="button button__selected" id="povertyButton" >
+              <p class="button__text">Poverty Rate</p>
+            </div>
+            <div class="button" id="childProvertyButton" >
+              <p class="button__text">Child Proverty Rate</p>
+            </div>
+            <div class="button" id="highSchoolGradButton" >
+              <p class="button__text">High School Graduate Rate</p>
+            </div>
+            <div class="button" id="higherEduButton" >
+              <p class="button__text">Higher Education Rate</p>
+            </div>
+            <div class="button" id="expendPerStudentButton">
+              <p class="button__text">Education Spending per Student</p>
+            </div>
+          </div>
+          <div class="compare_controls">
+            <label for="yAxis_Select">YAxis Variable</label>
+            <select id="y_select" name="yAxis_Select"> 
+              <option value="SelectAValue">Select A Value</option>
+              <option value="HigherEducationRate">Higher Education Rate</option>
+              <option value="PovertyRate">Poverty Rate</option>
+              <option value="HighSchoolGradRate">High School Graduation Rate</option>
+              <option value="UnemploymentRate">Unemployment Rate Rate</option>
+              <option value="studentsPerTeacher">Students Per Teacher</option>
+            </select>
+            <div class="button" id="scatter_preset_a" >
+              <p class="button__text">Preset A</p>
+            </div>
+            <div class="button" id="scatter_preset_b" >
+              <p class="button__text">Preset B</p>
+            </div>
+            <div class="button" id="scatter_preset_c" >
+              <p class="button__text">Preset C</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text__container">
+        <h3>Info</h3>
+        <p>
+          Data from The Center of American Progress and The National Center for Education Statistics. Map geometry data from d3's us json. US Map overview code is in ES6 (may not work in some browsers).
+        </p>
+      </div>
+    </div>
+  </body>
+  <script src="/assets/mapScript.js"></script>
+  <script src="/assets/scatterScript.js"></script>
+  <script src="/assets/controlScript.js"></script>
+</html>
