@@ -31,7 +31,7 @@ var tooltip = d3.select("div.svg__container").append("div")
 // data points
 var dotGroup;
 var axisRoundingY = 5;
-var axisRoundingX = 1;
+var axisRoundingX = 2000;
 
 var currentX = "Spending Per Student";
 
@@ -43,9 +43,11 @@ var presetButtonC = document.querySelector("#scatter_preset_c")
 
 var scatterInit = function(){
     yDropDown.addEventListener("change", function() {
+        // set x rounding
+        axisRoundingX = 2000;
         var tempYValue;
         var xValue = function(d) {
-            return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));
+            return d.ExpendPerStudent;
        };
        currentX="Spending per student";
 
@@ -55,12 +57,12 @@ var scatterInit = function(){
             tempYValue = function(d) { return parseFloat(d.HigherEducationRate);}
         }
         else if(yDropDown.value == "PovertyRate"){
-            axisRoundingY = 1;
+            axisRoundingY = 2;
             currentY = "Poverty Rate";
             tempYValue = function(d) { return parseFloat(d.PovertyRate);}
         }
         else if (yDropDown.value == "HighSchoolGradRate"){
-            axisRoundingY = 3;
+            axisRoundingY = 5;
             currentY = "High School Graduation Rate";
             tempYValue = function(d) { return (parseFloat(d.HighSchoolGradRate));}
         }
@@ -70,7 +72,7 @@ var scatterInit = function(){
             tempYValue = function(d) { return (parseFloat(d.UnemploymentRate));}
         }
         else if (yDropDown.value == "studentsPerTeacher"){
-            axisRoundingY = 1;
+            axisRoundingY = 2;
             currentY = "Students Per Teacher";
             tempYValue = function(d) {  return (parseFloat(d.TotalStudents) / parseFloat(d.TotalTeachers));}
         }
@@ -129,37 +131,37 @@ var scatterInit = function(){
 var visualize = function (error, data) {
     tempData = data;
 
-    // svg.selectAll("*").remove();
+    for (var i = 0; i < data.length; i++) {
+      var d = data[i];
+
+      tempData[i].ExpendPerStudent = Math.round(parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents) * 100) / 100;
+    }
 
     // Setup init x values
     var xValue = function(d) {
-         return (parseFloat(d.ExpendForEduc) / parseFloat(d.TotalStudents));
-    },
-    xMap = function(d) { 
-        return xScale(xValue(d));
-    },
-    xScale = d3.scaleLinear().range([0, width]);
+         return d.ExpendPerStudent;
+    };
+    var xScale = d3.scaleLinear().range([0, width]);
     xScale.domain([
         Math.floor((d3.min(data, xValue)-1) / axisRoundingX) * axisRoundingX,
         Math.ceil((d3.max(data, xValue)+1) / axisRoundingX) *axisRoundingX 
     ]);
+    var xMap = function(d) { 
+        return xScale(xValue(d));
+    };
     var xAxis = d3.axisBottom(xScale)
         .ticks(8)
         .tickSize(-height);
 
     // Setup init y values
-    var yValue = function(d) { return parseFloat(d.HigherEducationRate)},
-    yScale,
-    yMap,
-    yAxis;
-
-    yScale = d3.scaleLinear().range([height, 0]);
+    var yValue = function(d) { return parseFloat(d.HigherEducationRate)};
+    var yScale = d3.scaleLinear().range([height, 0]);
     yScale.domain([
         Math.floor((d3.min(data, yValue)-1) / axisRoundingY) * axisRoundingY,
         Math.ceil((d3.max(data, yValue)+1) / axisRoundingY ) * axisRoundingY
     ]);
-    yMap = function(d) { return yScale(yValue(d));};
-    yAxis = d3.axisLeft(yScale)
+    var yMap = function(d) { return yScale(yValue(d));};
+    var yAxis = d3.axisLeft(yScale)
         .ticks(8)
         .tickSize(-width);
 
@@ -171,7 +173,7 @@ var visualize = function (error, data) {
     watchTooltip.append('rect')
         .attr('x', 20)
         .attr('y', 0)
-        .attr('height', 220)
+        .attr('height', 240)
         .attr('width', 350)
         .attr('fill', '#F0F0F0')
         .attr('stroke', '#000')
@@ -188,7 +190,7 @@ var visualize = function (error, data) {
     hoverTooltip.append('rect')
         .attr('x', 20)
         .attr('y', 300)
-        .attr('height', 220)
+        .attr('height', 240)
         .attr('width', 350)
         .attr('fill', '#F0F0F0')
         .attr('stroke', '#000')
@@ -207,48 +209,50 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
     // x-axis
     horizontalGrid = svg.append("g")
     horizontalGrid.attr("class", "x__axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis)
-    .selectAll('.tick:not(:first-of-type) line')
-    .attr('stroke', '#BABABA');
-    horizontalGrid.append("text")
-    .attr("class", "label")
-    .attr("x", width)
-   // .attr("dx", "1.71em")
-    .attr("y", -6)
-    .style("text-anchor", "end")
-    .text(currentX)
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll('.tick:not(:first-of-type) line')
+        .attr('stroke', '#BABABA');
+        horizontalGrid.append("text")
+        .attr("class", "label")
+        .attr("x", width)
+       // .attr("dx", "1.71em")
+        .attr("y", -6)
+        .style("text-anchor", "end")
+        .text(currentX);
     
     
     // y-axis
-    verticalGrid = svg.append("g")
+    verticalGrid = svg.append("g");
     verticalGrid.attr("class", "y__axis")
-    .call(yAxis)
-    .selectAll('.tick:not(:first-of-type) line')
-    .attr('stroke', '#BABABA');
-    verticalGrid.append("text")
-    .attr("class", "label")
-    .attr("transform", "translate(20, 300)")        
-    //.attr("transform", "rotate(-90)")
-    .attr("y", 6)
-    .attr("dy", "1.71em")
-    //.style("text-anchor", "Start")
-    .attr("alignment-baseline", "hanging")
-    .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
-    .text(currentY || 'var name')
+        .call(yAxis)
+        .selectAll('.tick:not(:first-of-type) line')
+        .attr('stroke', '#BABABA');
+        verticalGrid.append("text")
+        .attr("class", "label")
+        .attr("transform", "translate(20, 300)")        
+        //.attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", "1.71em")
+        //.style("text-anchor", "Start")
+        .attr("alignment-baseline", "hanging")
+        .attr('style', 'writing-mode: vertical-rl; text-orientation: upright')
+        .text(currentY || 'var name')
     
-    dotGroup = svg.append('g');
+    dotGroup = svg.append('g')
+      .attr('class', 'dotGroup')
+      .selectAll('.circle') //any value seems to work but THIS is needed for it to grab correct circle
+      .data(data)
+      .enter()
+      .append('g');
 
     // draw dots
-    dotGroup.selectAll(".dot")
-        .data(data)
-        .enter()      
-        .append("circle")
+    dotGroup.append("circle")
         .attr('id', function(d) {
             return `scatter__${d.Abbr}`
         })
         .attr("class", "dot")
-        .attr("r", 10)
+        .attr("r", 12)
         .attr("cx", xMap)
         .attr("cy", yMap)
         .attr("fill", "rgba(155, 155, 155, 1)")
@@ -257,6 +261,16 @@ var initDraw = function (data, xMap, yMap, xAxis, yAxis, xValue, yValue){
         .on("mouseover", updateHoverWatch)
         .on("mouseout", clearHover)
         .on("click", updateWatchTooltip);
+
+    dotGroup.append('text')
+        .attr("class", "scatter__lable")
+            .attr("x", xMap)
+            .attr("y", yMap)
+            .attr("alignment-baseline", "middle")
+            .style("text-anchor", "middle")
+            .style("pointer-events", "none")
+            .style("font-size", "12px")
+            .text(function(d) { return d.Abbr; });
 };
 
 var reDraw = function(data, yValue, xValue) {
@@ -289,17 +303,13 @@ var reDraw = function(data, yValue, xValue) {
 
     //x-axis
     horizontalGrid.selectAll('*').remove();
-    horizontalGrid.attr('opacity', 0)
-        .transition()
-        .duration(400)
-        .attr('opacity', 1)
+    horizontalGrid.call(xAxis)
         .selectAll('.tick:not(:first-of-type) line')
         .attr('stroke', '#BABABA')
         .attr('opacity', 0)
         .transition()
         .duration(400)
         .attr('opacity', 1);
-    horizontalGrid.call(xAxis)
     horizontalGrid.append("text")
         .attr("class", "label")
         .attr("x", width)
@@ -340,12 +350,18 @@ var reDraw = function(data, yValue, xValue) {
         .attr('opacity', 1);
 
     dotGroup.selectAll(".dot")
-        .data(data)
         .merge(dotGroup)
         .transition()
         .duration(400)
         .attr("cy", yMap || 0)
         .attr("cx", xMap || 0);
+
+    dotGroup.selectAll(".scatter__lable")
+        .merge(dotGroup)
+        .transition()
+        .duration(400)
+        .attr("y", yMap || 0)
+        .attr("x", xMap || 0);
 };
 
 var watchTooltip;
@@ -442,14 +458,12 @@ var updateWatchTooltip = function(d) {
 
 var hoverTooltip;
 
-var updateHoverWatch = function(d){
-     // get the keys in object d
+var updateHoverWatch = function(d) {
+    // get the keys in object d
     // filter out Abbr and UnemploymentRate
     var keys = Object.keys(d).filter( function(key) {
         return key !== 'Abbr' && key !== 'UnemploymentRate';
     });
-    
-    console.log(d.Abbr);
     
     hoverTooltip.selectAll('.hover__' + d.Abbr)
         .data(keys)
@@ -492,8 +506,7 @@ var updateHoverWatch = function(d){
         .attr("fill", "rgb(200, 200, 200)")
 }
 
-var clearHover = function(d){
-    console.log(d.Abbr);
+var clearHover = function(d) {
     hoverTooltip.selectAll('.hover__' + d.Abbr)
         .transition()
         .duration(400)
